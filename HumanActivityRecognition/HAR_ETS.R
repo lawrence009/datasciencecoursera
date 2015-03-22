@@ -1,4 +1,4 @@
-# R script to extract HAR data files and create a data frame (df) for subsequent analysis
+# R script to extract and merge HAR training and test data files into a data frame (df) for subsequent analysis
 
 #library(data.table)
 
@@ -30,6 +30,10 @@ train <- cbind(activity, train)
 subject.id <- read.table("./UCI HAR Dataset/subject_train.txt", quote="\"")[,1]
 train <- cbind(subject.id, train)
 
+#label dataset
+train$dataset <- 'training'
+
+
 #read test dataset
 test <- read.table("./UCI HAR Dataset/X_test.txt", quote="\"")
 colnames(test) <- features.label
@@ -45,11 +49,15 @@ activity <- replace(activity, activity == 5, 'STANDING')
 activity <- replace(activity, activity == 6, 'LAYING')
 test <- cbind(activity, test)
 
+#
 subject.id <- read.table("./UCI HAR Dataset/subject_test.txt", quote="\"")[,1]
 test <- cbind(subject.id, test)
 
+#label dataset
+test$dataset <- 'test'
 
-#result tidy data
+
+#merge result 2 datasets into 1 tidy data
 df <- rbind(train, test)
 
 
