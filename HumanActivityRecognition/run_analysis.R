@@ -1,7 +1,7 @@
 # R script to analyze the tidy data set prepared with HAR_ETS.R
 
 # comment out if you don't want to reload the data
-#source('HAR_ETS.R')
+source('HAR_ETS.R')
 
 # We only want measurements on the mean and standard deviation
 # select mean and std
