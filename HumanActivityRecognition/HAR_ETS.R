@@ -6,9 +6,6 @@
 features.label <- read.table("./UCI HAR Dataset/features.txt", quote="\"")[,2]
 activities.label <- read.table("./UCI HAR Dataset/activity_labels.txt", quote="\"")
 
-#select mean and std
-features.mean  <- grep('mean', features.label)
-features.std <- grep('std', features.label)
 
 #create dataset
 #read training dataset
