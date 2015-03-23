@@ -1,14 +1,16 @@
 #Solution Code Book
+Getting and Cleaning Data course project (see Project Introduction)
+####R Scripts:
 * HAR_ETS.R
 * run_analysis.R
 
-####HAR_ETS.R
+#####HAR_ETS.R
 Extracts and merge the HAR files into a data frame named <b>df</b>.  This script appends subject.id, activity and dataset columns where
 * subject.id is the volunteer ID
 * activity is the descriptive activity name
 * dataset is either 'training' and 'test' group
 
-####run_analysis.R
+#####run_analysis.R
 Subsets df to <b>df2</b> containing only activity column and mean and standard deviation measures and output the means of each measures by activity type into a text file
 
 ####Project Introduction
