@@ -8,8 +8,8 @@ source('HAR_ETS.R')
 features.mean  <- grep('-mean', names(df), fixed=T)
 features.std <- grep('-std', names(df), fixed=T)
 
-df2 <- df[, c(2, features.mean, features.std)]
+df2 <- df[, c(1:2, features.mean, features.std)]
 
-activity.mean <- aggregate(df2[, 2:80], list(activity=df$activity), mean)
+activity.mean <- aggregate(df2[, 2:80], list(activity=df$activity, subject=df$subject.id), mean)
 
 write.table(activity.mean, file="activity.means.txt", row.name=F)
