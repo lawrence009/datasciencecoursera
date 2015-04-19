@@ -166,6 +166,7 @@ UpgradeLog*.htm
 App_Data/*.mdf
 App_Data/*.ldf
 
+
 #############
 ## Windows detritus
 #############
@@ -214,4 +215,18 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+
+#############
+## R Studio
+#############
 .Rproj.user
+.RData
+
+
+#############
+## Specific to this repo
+#############
+*.pdf
+*.mp4
+*.zip
