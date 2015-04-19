@@ -9,11 +9,12 @@ pollutantmean <- function(directory, pollutant, id = 1:332) {
     # 'id' is an integer vector indicating the monitor ID numbers
     # to be used
     
-    ppm <- NA  #is there another way to write this with first assigning NA
+    monitors <- list.files(directory, full.name=T)
+    
+    ppm <- NA  #is there another way to write this without first assigning NA
     
     for(i in id) {
-        file <- sprintf("%s/%03d.csv", directory, i)
-        ppm <- c(ppm, read.csv(file)[, pollutant])
+        ppm <- c(ppm, read.csv(monitors[i])[, pollutant])
     }
     
     # Return the mean of the pollutant across all monitors list
