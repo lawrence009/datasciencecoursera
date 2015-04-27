@@ -222,6 +222,7 @@ pip-log.txt
 #############
 .Rproj.user
 .RData
+.Rhistory
 
 
 #############
