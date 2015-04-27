@@ -4,6 +4,7 @@ hospital <- read.csv('hospital-data.csv')
 #first 10 column headers are the same as hospital.csv
 outcome <- read.csv('outcome-of-care-measures.csv', colClasses = 'character')
 
+#frequency of death resulted from heart attack
 outcome[, 11] <- as.numeric(outcome[, 11])
 hist(outcome[, 11])
 
