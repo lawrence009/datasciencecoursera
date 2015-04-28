@@ -1,4 +1,8 @@
-library(dplyr)
+#returns a character vector with the name of the hospital that has the best (i.e. lowest) 30-day
+#mortality for the specied outcome in that state. The hospital name is the name provided in the
+#Hospital.Name variable. The outcomes can be one of "heart attack", "heart failure", or
+#pneumonia". Hospitals that do not have data on a particular outcome should be excluded from the
+#set of hospitals when deciding the rankings
 
 best <- function(state, outcome) {
     #Read outcome data
@@ -33,12 +37,8 @@ best <- function(state, outcome) {
         stop('invalid param outcome: ', outcome)
     }
 
-
-    #none dpyrl solution
     df <- df[df$State == state, c('Hospital.Name', 'State', acceptable[outcome])]
+    df <- df[complete.cases(df), ]
     df <- df[order(df[1]), ] #order by states first
     df[order(df[3]), 1][1] #then order by outcome and return the first row hospital name
-
-
-
 }
