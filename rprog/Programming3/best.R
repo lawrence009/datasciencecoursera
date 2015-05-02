@@ -1,5 +1,5 @@
 #returns a character vector with the name of the hospital that has the best (i.e. lowest) 30-day
-#mortality for the specied outcome in that state. The hospital name is the name provided in the
+#mortality for the specified outcome in that state. The hospital name is the name provided in the
 #Hospital.Name variable. The outcomes can be one of "heart attack", "heart failure", or
 #pneumonia". Hospitals that do not have data on a particular outcome should be excluded from the
 #set of hospitals when deciding the rankings
