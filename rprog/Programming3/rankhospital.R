@@ -1,5 +1,20 @@
 #Ranking hospitals by outcome in a state
 
+"-------------------------------------------------------------------------------
+Return a character vector containing the name of the hospital with the 5th
+lowest 30-day death rate for heart failure. The num argument can take values
+best, worst, or an integer indicating the ranking (smaller numbers are better).
+If the number given by num is larger than the number of hospitals in that
+state, then the function should return NA. Hospitals that do not have data on
+a particular outcome should be excluded from the set of hospitals when deciding
+the rankings.
+
+Handling ties
+-------------
+It may occur that multiple hospitals have the same 30-day mortality rate for a
+given cause of death. In those cases ties should be broken by using the hospital
+name, i.e. order by Rate, then Hospital.Name
+-------------------------------------------------------------------------------"
 
 rankhospital <- function(state, outcome, num = "best") {
 
@@ -34,5 +49,16 @@ rankhospital <- function(state, outcome, num = "best") {
     ## Return hospital name in that state with the given rank
     ## 30-day death rate
     
-    NA
+    df <- df[df$State == state, c('Hospital.Name', 'State', acceptable[outcome])]
+    df <- df[complete.cases(df), ]
+    
+    df <- df[order(df[, 3], df[, 1]), 1:3]
+    df$Rank <- rank(df[, 3], ties.method = 'first') #not necessary for the assigment; extra credit; also for validating result
+    
+    df # for testing
+    #df[num, 1]
+
 }
+
+#test case
+#print(rankhospital("TX", "heart failure", 4))
