@@ -52,7 +52,7 @@ rankhospital <- function(state, outcome, num = "best") {
     ## 30-day death rate
     
     df <- df[df$State == state, c('Hospital.Name', 'State', acceptable[outcome])]
-    #df <- df[complete.cases(df), ]
+    df <- df[complete.cases(df), ]
     
     df <- df[order(df[, 3], df[, 1]), 1:3]
     df$Rank <- rank(df[, 3], ties.method = 'first') #not necessary for the assigment; extra credit; also for validating result
