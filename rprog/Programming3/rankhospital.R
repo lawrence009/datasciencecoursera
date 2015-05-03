@@ -63,6 +63,7 @@ rankhospital <- function(state, outcome, num = "best") {
         num  <- nrow(df)
     } else if (!is.numeric(num)) {
         warning('invalid ranking; best is assumed')
+        num <- 1
     }
     
     df[num, 1]
