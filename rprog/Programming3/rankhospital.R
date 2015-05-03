@@ -75,4 +75,4 @@ rankhospital <- function(state, outcome, num = "best") {
 #test case
 #print(rankhospital("TX", "heart failure", 4))
 
-#rankhospital("NY", "heart attak", 7) #typo in the submit script
+#rankhospital("NY", "heart attak", 7) #test case from submit script; expect function to throw an error
