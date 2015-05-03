@@ -1,3 +1,6 @@
+#test cases
+source('best.R')
+
 print('test #1')
 print(best("TX", "heart attack") == "CYPRESS FAIRBANKS MEDICAL CENTER")
 
