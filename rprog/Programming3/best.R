@@ -26,7 +26,7 @@ best <- function(state, outcome) {
     
     ## Check that state param is valid
     if(!(state %in% df$State)) {
-        stop('invalid param  state: ', state)
+        stop('invalid state: ', state)
     }
    
     acceptable <- colnames(df[4:6])
@@ -34,7 +34,7 @@ best <- function(state, outcome) {
 
     ## Check that outcome param is valid
     if(!(outcome %in% names(acceptable))) {
-        stop('invalid param outcome: ', outcome)
+        stop('invalid outcome: ', outcome)
     }
 
     df <- df[df$State == state, c('Hospital.Name', 'State', acceptable[outcome])]

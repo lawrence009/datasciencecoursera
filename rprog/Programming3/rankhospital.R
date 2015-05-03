@@ -34,7 +34,7 @@ rankhospital <- function(state, outcome, num = "best") {
     
     #check that state param is valid
     if(!(state %in% df$State)) {
-        stop('invalid param  state: ', state)
+        stop('invalid param state: ', state)
     }
     
     acceptable <- colnames(df[4:6])
@@ -55,9 +55,19 @@ rankhospital <- function(state, outcome, num = "best") {
     df <- df[order(df[, 3], df[, 1]), 1:3]
     df$Rank <- rank(df[, 3], ties.method = 'first') #not necessary for the assigment; extra credit; also for validating result
     
-    df # for testing
-    #df[num, 1]
+    if (num == 'best') {
+        num <- 1
+    } else if (num == 'worst') {
+        num  <- nrow(df)
+    } else if (!is.numeric(num)) {
+        warning('invalid ranking; best is assumed')
+    }
+    
+    df[num, 1]
 
+    #uncomment next line to return full subset for debugging
+    #df
+    
 }
 
 #test case

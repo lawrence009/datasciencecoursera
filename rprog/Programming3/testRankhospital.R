@@ -12,3 +12,6 @@ print(is.na(rankhospital("MN", "heart attack", 5000) == NA))
 
 print('test #4')
 print(rankhospital("CA", "heart failure", "best") == "CENTINELA HOSPITAL MEDICAL CENTER")
+
+print('test #5')
+print(is.na(rankhospital("MN", "heart attack", "foobar") == "MERCY HOSPITAL"))
