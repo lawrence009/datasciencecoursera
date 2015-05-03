@@ -17,7 +17,7 @@ name, i.e. order by Rate, then Hospital.Name
 -------------------------------------------------------------------------------"
 
 rankhospital <- function(state, outcome, num = "best") {
-
+    
     #read outcome data
     url <- 'outcome-of-care-measures.csv'
     
@@ -34,7 +34,8 @@ rankhospital <- function(state, outcome, num = "best") {
     
     #check that state param is valid
     if(!(state %in% df$State)) {
-        stop('invalid param state: ', state)
+        stop('invalid state') #this is what the test case expect
+#         stop('invalid param state: ', state)
     }
     
     acceptable <- colnames(df[4:6])
@@ -42,7 +43,8 @@ rankhospital <- function(state, outcome, num = "best") {
     
     ## Check that outcome param is valid
     if(!(outcome %in% names(acceptable))) {
-        stop('invalid param outcome: ', outcome)
+        stop('invalid outcome') #this is what the test case expect
+#         stop('invalid param outcome: ', outcome)
     }
     
     
@@ -50,7 +52,7 @@ rankhospital <- function(state, outcome, num = "best") {
     ## 30-day death rate
     
     df <- df[df$State == state, c('Hospital.Name', 'State', acceptable[outcome])]
-    df <- df[complete.cases(df), ]
+    #df <- df[complete.cases(df), ]
     
     df <- df[order(df[, 3], df[, 1]), 1:3]
     df$Rank <- rank(df[, 3], ties.method = 'first') #not necessary for the assigment; extra credit; also for validating result
@@ -72,3 +74,5 @@ rankhospital <- function(state, outcome, num = "best") {
 
 #test case
 #print(rankhospital("TX", "heart failure", 4))
+
+#rankhospital("NY", "heart attak", 7) #typo in the submit script
