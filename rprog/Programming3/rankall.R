@@ -51,16 +51,42 @@ rankall <- function(outcome, num = "best") {
     
     dl <- split(df, df$State)
     
-    length.state = length(df)
+    length.state = length(dl)
     
     df <- data.frame(matrix(nrow = length.state, ncol = 2))
+    colnames(df) <- c('hospital', 'state')
+    
+
+    
+    for (i in 1:length.state) {
+
+        if (num == 'best') {
+            j <- 1
+        } else if (num == 'worst') {
+            dl[[i]] <- dl[[i]][complete.cases(dl[[i]]), ]
+                       dl[[i]][complete.cases(dl[[i]]), ]
+            j <- nrow(dl[[i]])
+        } else if (!is.numeric(num)) {
+            stop('invalid outcome')
+        }
+        
+        df$hospital[i] <- dl[[i]]$Hospital.Name[j]
+        df$state[i] <- dl[[i]]$State[1]
+    }
     
     ## Return a data frame with the hospital names and the
     ## (abbreviated) state name
     
+    df
     
+    #uncomment next line to return full subset for debugging
+    #dl
 }
 
 
-#test case
+#test cases
+#tc <- rankall("heart attack", 20)
+tc <- rankall("pneumonia", "worst")
 #print(head(rankall("heart attack", 20), 10))
+#print(tail(rankall("pneumonia", "worst"), 3))
+#print(tail(rankall("heart failure"), 10))
