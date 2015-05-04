@@ -64,7 +64,6 @@ rankall <- function(outcome, num = "best") {
             j <- 1
         } else if (num == 'worst') {
             dl[[i]] <- dl[[i]][complete.cases(dl[[i]]), ]
-                       dl[[i]][complete.cases(dl[[i]]), ]
             j <- nrow(dl[[i]])
         } else if (!is.numeric(num)) {
             stop('invalid outcome')
@@ -86,7 +85,7 @@ rankall <- function(outcome, num = "best") {
 
 #test cases
 #tc <- rankall("heart attack", 20)
-tc <- rankall("pneumonia", "worst")
+#tc <- rankall("pneumonia", "worst")
 #print(head(rankall("heart attack", 20), 10))
 #print(tail(rankall("pneumonia", "worst"), 3))
 #print(tail(rankall("heart failure"), 10))
