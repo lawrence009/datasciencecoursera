@@ -1,3 +1,6 @@
 [submodule "rprog/Programming2"]
 	path = rprog/Programming2
 	url = https://github.com/lawrence009/ProgrammingAssignment2.git
+[submodule "exdata/Prj1"]
+    path = exdata/Prj1
+    url = https://github.com/lawrence009/ExploratoryDataAnalysis_Plotting1.git
