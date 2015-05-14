@@ -1,0 +1,17 @@
+#############
+## R Studio
+#############
+.Rproj.user
+.RData
+.Rhistory
+
+
+#############
+## Specific to this repo
+#############
+*.pdf
+*.zip
+*.csv
+PA1_template.md
+*_cache
+*_files
