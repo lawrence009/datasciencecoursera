@@ -200,3 +200,8 @@ legend('topright',
 
 
 ### Imputing missing value using average steps from each 5-minute interval vs.
+average daily total steps
+```{r}
+mean(subject$steps, na.rm = T)
+mean(total.steps.day) / 288
+```
