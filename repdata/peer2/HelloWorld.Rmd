@@ -1,9 +1,12 @@
 ---
-title: "Impact Analysis of Types of Severe Weather Events"
+title: "Impact Analysis of Severe Weather Events"
 author: "Lawrence C. Chen"
 date: "Friday, May 15, 2015"
 output: html_document
 ---
+
+## Synopsis
+
 
 ## Loading and preprocessing the raw data
 ```{r data, cache=TRUE}
@@ -11,14 +14,29 @@ library(data.table)
 
 filename <- 'repdata-data-StormData.csv.bz2'
 
-dt <- read.csv(filename, nrows = 100)
+sample <- read.csv(filename, nrows = 100)
 
-colClasses <- vapply(dt, class, 'character')
+colClasses <- vapply(sample, class, 'character')
 
-dt <- as.data.table(read.csv(filename, colClasses = 'character'))
+dtl <- as.data.table(read.csv(filename, na.strings = '', colClasses = 'character'))
 
+dim(dtl)
+
+head(dtl)
+
+sort(dtl[, unique(EVTYPE)])
 ```
 
+
+```{r event type cleansing}
+library(data.table)
+
+sort(dtl[, unique(EVTYPE)])
+```
+
+
+
+### Assignment Instructions 
 
 The basic goal of this assignment is to explore the NOAA Storm Database and answer some basic questions about severe weather events. You must use the database to answer the questions below and show the code for your entire analysis. Your analysis can consist of tables, figures, or other summaries. You may use any R package you want to support your analysis.
 
@@ -26,21 +44,16 @@ Questions
 
 Your data analysis must address the following questions:
 
-Across the United States, which types of events (as indicated in the EVTYPE variable) are most harmful with respect to population health?
+* Across the United States, which types of events (as indicated in the EVTYPE variable) are most harmful with respect to population health?
 
-Across the United States, which types of events have the greatest economic consequences?
+* Across the United States, which types of events have the greatest economic consequences?
 
 Consider writing your report as if it were to be read by a government or municipal manager who might be responsible for preparing for severe weather events and will need to prioritize resources for different types of events. However, there is no need to make any specific recommendations in your report.
 
-Requirements
 
-For this assignment you will need some specific tools
+###Requirements
 
-RStudio: You will need RStudio to publish your completed analysis document to RPubs. You can also use RStudio to edit/write your analysis.
-
-knitr: You will need the knitr package in order to compile your R Markdown document and convert it to HTML
-
-Document Layout
+####Document Layout
 
 Language: Your document should be written in English.
 
@@ -60,7 +73,7 @@ Your analyis must have no more than three figures. Figures may have multiple plo
 
 You must show all your code for the work in your analysis document. This may make the document a bit verbose, but that is okay. In general, you should ensure that echo = TRUE for every code chunk (this is the default setting in knitr).
 
-Publishing Your Analysis
+####Publishing Your Analysis
 
 For this assignment you will need to publish your analysis on RPubs.com. If you do not already have an account, then you will have to create a new account. After you have completed writing your analysis in RStudio, you can publish it to RPubs by doing the following:
 
