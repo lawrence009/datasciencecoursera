@@ -2,10 +2,12 @@ library(data.table)
 
 filename <- 'repdata-data-StormData.csv.bz2'
 
-if (!exists('dt')) {
-    dt <- read.csv(filename, nrows = 100)
+sample <- read.csv(filename, nrows = 100)
 
-    colClasses <- vapply(dt, class, 'character')
+colClasses <- vapply(sample, class, 'character')
 
-    dt <- as.data.table(read.csv(filename, colClasses = 'character'))
+#large data set; skip read if already exists in the environment
+if (!exists('dtbl')) {
+    dtbl <- as.data.table(read.csv(filename, colClasses = 'character'))
 }
+
