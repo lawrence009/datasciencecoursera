@@ -2,23 +2,43 @@
 title: "Impact Analysis of Severe Weather Events"
 author: "Lawrence C. Chen"
 date: "Friday, May 15, 2015"
-output: html_document
+output: 
+  html_document:
+    keep_md: true
 ---
 
 ## Synopsis
 
 
 ## Loading and preprocessing the raw data
-```{r data, cache=TRUE}
-library(data.table)
 
+```{r download and sample data}
+url <- 'https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2'
 filename <- 'repdata-data-StormData.csv.bz2'
+
+#check if the data file is available
+if (!file.exists(filename)) {
+    download.file(url = url, destfile = filename)
+}
 
 sample <- read.csv(filename, nrows = 100)
 
-colClasses <- vapply(sample, class, 'character')
+head(sample)
 
-dtl <- as.data.table(read.csv(filename, na.strings = '', colClasses = 'character'))
+colClasses <- vapply(sample, class, 'character')
+ch <- grep('(logical|integer|factor)', colClasses)
+colClasses[ch] <- 'character'
+
+as.data.frame(colClasses)
+```
+
+
+
+```{r data, cache=TRUE}
+library(data.table)
+
+
+dtl <- as.data.table(read.csv(filename, na.strings = '', colClasses = colClasses))
 
 dim(dtl)
 
