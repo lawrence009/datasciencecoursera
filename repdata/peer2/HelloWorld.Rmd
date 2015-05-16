@@ -9,6 +9,13 @@ output:
 
 ## Synopsis
 
+Research questions:
+
+* Across the United States, which types of events (as indicated in the EVTYPE
+variable) are most harmful with respect to population health?
+
+* Across the United States, which types of events have the greatest economic
+consequences?
 
 ## Loading and preprocessing the raw data
 
@@ -37,7 +44,6 @@ as.data.frame(colClasses)
 ```{r data, cache=TRUE}
 library(data.table)
 
-
 dtl <- as.data.table(read.csv(filename, na.strings = '', colClasses = colClasses))
 
 dim(dtl)
@@ -51,20 +57,21 @@ library(data.table)
 
 setnames(dtl, c(1, 35), c('STATE_FIPS', 'LONGITUDE_E'))
 
-dtl[, BGN_DATE:=as.IDate(BGN_DATE, '%m/%d/%Y')]
+dtl[, ':='(STATE_FIPS =as.integer(STATE_FIPS),
+           BGN_DATE   =as.IDate(BGN_DATE, '%m/%d/%Y'),
+           EVTYPE     =toupper(EVTYPE),           
+           REFNUM     =as.integer(REFNUM))]
 
-head(dtl)
 ```
 
+too many events; how about categories of events?
 
-
-```{r event type cleansing}
+dimensionality reduction; feature extraction
+```{r event types}
 library(data.table)
 
 sort(dtl[, unique(EVTYPE)])
 
-
-dtl[, EVTYPE:=toupper(EVTYPE)]
 
 #HUNDERSTORM WIND
 dtl[grepl('SUMMARY', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EVTYPE:='THUNDERSTORM WIND']
@@ -84,69 +91,10 @@ dtl[grepl('SUMMARY', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EVTYPE:='BLIZZARD'
 #VOLCANIC ASH
 dtl[grepl('VO', EVTYPE), EVTYPE:='VOLCANIC ASH']
 
-sort(dtl[, unique(EVTYPE)])
+
 ```
 
 
-too many events; how about categories of events?
-
-In some cases, such as with Hurricane Katrina, it may be nearly impossible to determine what
-event (i.e., Storm Surge/Tide, Hurricane, Flash Flood, or High Surf) resulted in a directly-related
-death. For these situations, in order to simplify the Storm Data preparation process, it is
-appropriate to assign the death to the Hurricane (Typhoon) event. However, state this fact in the
-event narrative.
-
-
-2.1.1 Storm Data Event Table
-Event Name Designator Event Name Designator
-Astronomical Low Tide Z
-Avalanche Z
-Blizzard Z
-Coastal Flood Z
-Cold/Wind Chill Z
-Debris Flow C
-Dense Fog Z
-Dense Smoke Z
-Drought Z
-Dust Devil C
-Dust Storm Z
-Excessive Heat Z
-Extreme Cold/Wind Chill Z
-Flash Flood C
-Flood C
-Frost/Freeze Z
-Funnel Cloud C
-Freezing Fog Z
-Hail C
-Heat Z
-Heavy Rain C
-Heavy Snow Z
-High Surf Z
-High Wind Z
-Hurricane (Typhoon) Z
-Ice Storm Z
-Lake-Effect Snow Z
-Lakeshore Flood Z
-Lightning C
-Marine Hail M
-Marine High Wind M
-Marine Strong Wind M
-Marine Thunderstorm Wind M
-Rip Current Z
-Seiche Z
-Sleet Z
-Storm Surge/Tide Z
-Strong Wind Z
-Thunderstorm Wind C
-Tornado C
-Tropical Depression Z
-Tropical Storm Z
-Tsunami Z
-Volcanic Ash Z
-Waterspout M
-Wildfire Z
-Winter Storm Z
-Winter Weather Z
 
 ### Assignment Instructions 
 

@@ -39,24 +39,31 @@ head(sample1)
 #large data set; skip read if already exists in the environment
 if (!exists('dtl')) {
     dtl <- as.data.table(read.csv(filename, na.strings = '', colClasses = colClasses2))
+
+    #dtl[1:10, as.Date(BGN_DATE, '%m/%d/%Y')]
+
+    #dtl[1:10, as.IDate(BGN_DATE, '%m/%d/%Y')]
+
+    #dtl[, c('FATALITIES','INJURIES','PROPDMG'):=list(as.numeric(FATALITIES), as.numeric(INJURIES), as.numeric(PROPDMG))]
+
+    dtl[, ':='(STATE__    =as.integer(STATE__),
+               BGN_DATE   =as.IDate(BGN_DATE, '%m/%d/%Y'),
+               EVTYPE     =tolower(EVTYPE),
+               REFNUM     =as.integer(REFNUM))]
+
+    events <- dtl[, c('REFNUM', 'EVTYPE', 'REMARKS'), with=F]
+
+    dtl <- dtl[, c(37, 2, 6:8, 22:28), with=F]
 }
 
+evtypes <- sort(unique(dtl$EVTYPE))
 
-#dtl[1:10, as.Date(BGN_DATE, '%m/%d/%Y')]
-
-#dtl[1:10, as.IDate(BGN_DATE, '%m/%d/%Y')]
-
-#dtl[, c('FATALITIES','INJURIES','PROPDMG'):=list(as.numeric(FATALITIES), as.numeric(INJURIES), as.numeric(PROPDMG))]
-
-dtl[, ':='(STATE__    =as.integer(STATE__),
-           BGN_DATE   =as.IDate(BGN_DATE, '%m/%d/%Y'),
-           REFNUM     =as.integer(REFNUM))]
 
 #dtl[FATALITIES & 0 & INJURIES == 0 & PROPDMG == 0]
 
 #dtl[, EVTYPE:=toupper(EVTYPE)]
 
-events <- dtl[, c('REFNUM', 'EVTYPE', 'REMARKS'), with=F]
+
 
 #F : F-Scale ; Fujita Scale
 
@@ -68,21 +75,25 @@ events <- dtl[, c('REFNUM', 'EVTYPE', 'REMARKS'), with=F]
 
 #Summary
 #HUNDERSTORM WIND
-events[grepl('Summary', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EVTYPE:='THUNDERSTORM WIND']
+events[grepl('summary', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EVTYPE:='THUNDERSTORM WIND']
 
 #HAIL
-events[grepl('Summary', EVTYPE) & grepl('[Hh]ail', REMARKS), EVTYPE:='HAIL']
+events[grepl('summary', EVTYPE) & grepl('[Hh]ail', REMARKS), EVTYPE:='HAIL']
 
 #FLASH FLOOD
-events[grepl('Summary', EVTYPE) & grepl('[Ff]lash flood', REMARKS), EVTYPE:='FLASH FLOOD']
+events[grepl('summary', EVTYPE) & grepl('[Ff]lash flood', REMARKS), EVTYPE:='FLASH FLOOD']
 
 #LIGHTNING
-events[grepl('Summary', EVTYPE) & grepl('[Ll]ightning', REMARKS), EVTYPE:='LIGHTNING']
+events[grepl('summary', EVTYPE) & grepl('[Ll]ightning', REMARKS), EVTYPE:='LIGHTNING']
 
 #blizzards
-events[grepl('Summary', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EVTYPE:='BLIZZARD']
+events[grepl('summary', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EVTYPE:='BLIZZARD']
 
-events[grepl('Summary', EVTYPE), REMARKS]
+events[grepl('summary', EVTYPE), REMARKS]
+
 
 
 sort(events[, unique(EVTYPE)])
+
+
+
