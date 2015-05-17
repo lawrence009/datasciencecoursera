@@ -9,6 +9,8 @@ output:
 
 ## Synopsis
 
+where did you get the data
+
 Research questions:
 
 * Across the United States, which types of events (as indicated in the EVTYPE
@@ -19,7 +21,7 @@ consequences?
 
 ## Loading and preprocessing the raw data
 
-```{r download and sample data}
+```{r download and sample data, echo=FALSE, results='hide'}
 url <- 'https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2'
 filename <- 'repdata-data-StormData.csv.bz2'
 
@@ -30,31 +32,32 @@ if (!file.exists(filename)) {
 
 sample <- read.csv(filename, nrows = 100)
 
-head(sample)
-
 colClasses <- vapply(sample, class, 'character')
 ch <- grep('(logical|integer|factor)', colClasses)
 colClasses[ch] <- 'character'
-
-as.data.frame(colClasses)
 ```
 
 
-```{r data, cache=TRUE}
+```{r data, cache=TRUE, echo=FALSE, message=FALSE}
 library(data.table)
 
 dtl <- as.data.table(read.csv(filename, na.strings = '', colClasses = colClasses))
+```
 
-dim(dtl)
+This data set consists of `r dim(dtl)[1]` observations and `r dim(dtl)[2]`
+variables.  The first 6 rows of the data are as below:
+
+```{r, echo=FALSE, message=FALSE}
+library(data.table)
 
 head(dtl)
 ```
 
-Columns crucial to the analsyis are:
+Columns crucial to the analysis are:
 
 * STATE (2-letter state designation, including the US Territories)
 
-* BGN_DATE (date which the event occured)
+* BGN_DATE (date which the event occurred)
 
 * EVTYPE (type of event)
 
@@ -66,12 +69,12 @@ Columns crucial to the analsyis are:
 
 * PROPDMGEXP (magnitude of amount in thousand (K), million (M), or billion (B))
 
-* CROPDMG (dollar amount of crop damange)
+* CROPDMG (dollar amount of crop damage)
 
 * CROPDMGEXP (magnitude of amount in thousand (K), million (M), or billion (B))
 
-###Data cleansing
-```{r colnames, results='hide'}
+### Data cleansing
+```{r colnames, results='hide', echo=FALSE}
 library(data.table)
 
 setnames(dtl, c(1, 35), c('STATE_FIPS', 'LONGITUDE_E'))
@@ -81,12 +84,21 @@ dtl[, ':='(STATE_FIPS =as.integer(STATE_FIPS),
            EVTYPE     =tolower(EVTYPE),           
            REFNUM     =as.integer(REFNUM))]
 
+obs.total <- dim(dtl)[1]
+obs.dmg <- dim(dtl[PROPDMG > 0 | CROPDMG > 0])[1]
+obs.badexp <- dtl[PROPDMG > 0 | CROPDMG > 0,
+                  sum((!grepl('[KMBkmb]', PROPDMGEXP) |
+                           !grepl('[KBMkbm]', CROPDMGEXP)))]
+
 ```
 
-Of the `r dim(dtl)[1]` rows of data, `r dtl[PROPDMG > 0 | CROPDMG > 0 , sum((!grepl('[KMBkmb]', PROPDMGEXP) | !grepl('[KBMkbm]', CROPDMGEXP)))]` of which do not have the proper magnitude
-desingations.  In those instances, thousand (K) are assumed.
+Of `r obs.total` total observations (obs), `r obs.dmg` obs. contain property or
+crop damage estimates.  However, `r round(obs.badexp / obs.dmg * 100, 2) ` percent
+of which do not have the proper magnitude designations: K, M or B. In those
+instances, thousand (K) is assumed. If magnitude is specified as one of the number
+between 1 to 9, the number is used as the exponent of 10.
 
-```{r damage tally, results='hide'}
+```{r damage calc, results='hide', echo=FALSE}
 dmgAmt <- function(value, magnitude = 'K') {
     #returns dollar value in mulitple of thousands.
     #If magnitude is not one of 'K', 'M' or 'B', assume 'K'.
@@ -97,8 +109,10 @@ dmgAmt <- function(value, magnitude = 'K') {
 
     for (i in 1:length(value)) {
         mag <- toupper(magnitude[i])
-
-        if (!grepl('[MB]', mag) | is.na(mag)) {
+        
+        if (grepl('[1-9]', mag)) {
+            val[i] <- value[i] * 10^(as.numeric(mag) - 3)
+        } else if (!grepl('[MB]', mag) | is.na(mag)) {
             val[i] <- value[i]
         } else if (mag == 'M') {
             val[i] <- value[i] * 1e3
@@ -115,25 +129,58 @@ dtl[PROPDMG > 0, PropDmg:=dmgAmt(PROPDMG, PROPDMGEXP)]
 dtl[CROPDMG > 0, CropDmg:=dmgAmt(CROPDMG, CROPDMGEXP)]
 ```
 
-```{r damage tally2}
-dtl[, .(PropDmg=sum(PropDmg, na.rm = T),
-        CropDmg=sum(CropDmg, na.rm = T),
-        Injuries=sum(INJURIES, na.rm = T),
-        Fatalitites=sum(FATALITIES, na.rm = T)),
-    by = STATE]
+The adjustments to the affected damage estimates are summarized below:
+```{r adjust magnitude, echo=FALSE}
+bad.propexp <- dtl[, PROPDMG > 0 & !grepl('[KMBkmb]', PROPDMGEXP)]
+
+bad.cropexp <- dtl[, CROPDMG > 0 & !grepl('[KMBkmb]', CROPDMGEXP)]
+
+propdmg <- dtl[bad.propexp, .(PropDmg=sum(PropDmg, na.rm = T),
+                              PROPDMG=sum(PROPDMG, na.rm = T))]
+cropdmg <- dtl[bad.cropexp, .(CropDmg=sum(CropDmg, na.rm = T),
+                              CROPDMG=sum(CROPDMG, na.rm = T))]
+
+diff <- cbind(t(propdmg), t(cropdmg))
+colnames(diff) <- c('Properties', 'Crops')
+rownames(diff) <- c('Adjusted', 'Original')
+
+diff
 ```
 
+```{r damage tally, echo=FALSE}
+dmg.summary <- dtl[, .('Prop Damage'=sum(PropDmg, na.rm = T),
+                       'Crop Damage'=sum(CropDmg, na.rm = T),
+                       Injuries=sum(INJURIES, na.rm = T),
+                       Fatalitites=sum(FATALITIES, na.rm = T)),
+                   by = STATE]
 
+zero.dmg <- which(rowSums(dmg.summary[, c(2:5), with=F]) == 0)
+```
 
-too many events; how about categories of events?
+```{r}
+head(dmg.summary)
+```
 
-dimensionality reduction; feature extraction
+And these states have no reported damages: `r dmg.summary$STATE[zero.dmg]`
+
+### Dimensionality reduction (feature extraction) of EVTYPE
+
 ```{r event types}
-library(data.table)
+# Permitted Storm Data Events
+evlist <- read.csv('EventTable.csv', na.strings='')
 
-sort(dtl[, unique(EVTYPE)])
+# Event types from the data set
+evtype <- sort(dtl[, unique(EVTYPE)])
+
+head(evtype, 30)
+
+```
+
+Many of the event types in the data set do not match the office list of event
+names.  too many events; how about categories of events?
 
 
+```{r event type reduction, results='hide'}
 #HUNDERSTORM WIND
 dtl[grepl('summary', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EVTYPE:='Thunderstorm Wind']
 

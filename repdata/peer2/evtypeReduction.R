@@ -32,7 +32,7 @@ source('readData.R')
 # sort(events[, unique(EVTYPE)])
 
 
-evmap <- read.csv('eventmapping.csv',
+evmap <- read.csv('EventMapping.csv',
                   na.strings = '',
                   colClasses = 'character')[2:3]
 

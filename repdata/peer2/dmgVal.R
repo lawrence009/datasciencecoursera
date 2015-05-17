@@ -16,6 +16,7 @@ mag <- function(x) {
 
 dmgAmt <- function(value, magnitude = 'K') {
     #returns dollar value in mulitple of thousands.
+    #If mangitude is [1-9], accepts it
     #If magnitude is not one of 'K', 'M' or 'B', assume 'K'.
 
     #assumes value and magnitude are both equal length
@@ -25,7 +26,9 @@ dmgAmt <- function(value, magnitude = 'K') {
     for (i in 1:length(value)) {
         mag <- toupper(magnitude[i])
 
-        if (!grepl('[MB]', mag) | is.na(mag)) {
+        if (grepl('[1-9]', mag)) {
+            val[i] <- value[i] * 10^(as.numeric(mag) - 3)
+        } else if (!grepl('[MB]', mag) | is.na(mag)) {
             val[i] <- value[i]
         } else if (mag == 'M') {
             val[i] <- value[i] * 1e3
@@ -41,14 +44,35 @@ dmgAmt <- function(value, magnitude = 'K') {
 
 print(head(dtl[PROPDMG > 0, (dmgAmt(PROPDMG, PROPDMGEXP))]))
 
-dtl[PROPDMG > 0, PropDmgVal:=dmgAmt(PROPDMG, PROPDMGEXP)]
+dtl[PROPDMG > 0, PropDmg:=dmgAmt(PROPDMG, PROPDMGEXP)]
 
-dtl[CROPDMG > 0, CropDmgVal:=dmgAmt(CROPDMG, CROPDMGEXP)]
+dtl[CROPDMG > 0, CropDmg:=dmgAmt(CROPDMG, CROPDMGEXP)]
 
-print(
-dtl[, .(PropDmg=sum(PropDmgVal, na.rm = T),
-        CropDmg=sum(CropDmgVal, na.rm = T),
+
+dtl[, .(PropDmg=sum(PropDmg, na.rm = T),
+        CropDmg=sum(CropDmg, na.rm = T),
         Injuries=sum(INJURIES, na.rm = T),
         Fatalitites=sum(FATALITIES, na.rm = T)),
-    by = STATE]
-)
+    by = STATE] -> dmg.summary
+
+
+
+bad.propexp <- dtl[, PROPDMG > 0 & !grepl('[KMBkmb]', PROPDMGEXP)]
+
+
+bad.cropexp <- dtl[, CROPDMG > 0 & !grepl('[KMBkmb]', CROPDMGEXP)]
+
+
+propdmg <- dtl[bad.propexp, .(PropDmg=sum(PropDmg, na.rm = T),
+                              PROPDMG=sum(PROPDMG, na.rm = T))]
+cropdmg <- dtl[bad.cropexp, .(CropDmg=sum(CropDmg, na.rm = T),
+                              CROPDMG=sum(CROPDMG, na.rm = T))]
+
+rm(bad.propexp, bad.cropexp)
+
+diff <- cbind(t(propdmg), t(cropdmg))
+colnames(diff) <- c('Properties', 'Crops')
+rownames(diff) <- c('Adjusted', 'Original')
+
+print(diff)
+
