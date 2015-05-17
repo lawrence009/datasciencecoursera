@@ -1,5 +1,5 @@
 ---
-title: "Impact Analysis of Severe Weather Events"
+title: "Impact of Severe Weather Events Across the United States between 1950 and 2011"
 author: "Lawrence C. Chen"
 date: "Friday, May 15, 2015"
 output: 
@@ -40,7 +40,6 @@ as.data.frame(colClasses)
 ```
 
 
-
 ```{r data, cache=TRUE}
 library(data.table)
 
@@ -51,18 +50,80 @@ dim(dtl)
 head(dtl)
 ```
 
+Columns crucial to the analsyis are:
+
+* STATE (2-letter state designation, including the US Territories)
+
+* BGN_DATE (date which the event occured)
+
+* EVTYPE (type of event)
+
+* FATALITIES (no. of human fatalities)
+
+* INJURIES (no. of human injuries)
+
+* PROPDMG (dollar amount of property damage)
+
+* PROPDMGEXP (magnitude of amount in thousand (K), million (M), or billion (B))
+
+* CROPDMG (dollar amount of crop damange)
+
+* CROPDMGEXP (magnitude of amount in thousand (K), million (M), or billion (B))
+
 ###Data cleansing
-```{r colnames}
+```{r colnames, results='hide'}
 library(data.table)
 
 setnames(dtl, c(1, 35), c('STATE_FIPS', 'LONGITUDE_E'))
 
 dtl[, ':='(STATE_FIPS =as.integer(STATE_FIPS),
            BGN_DATE   =as.IDate(BGN_DATE, '%m/%d/%Y'),
-           EVTYPE     =toupper(EVTYPE),           
+           EVTYPE     =tolower(EVTYPE),           
            REFNUM     =as.integer(REFNUM))]
 
 ```
+
+Of the `r dim(dtl)[1]` rows of data, `r dtl[PROPDMG > 0 | CROPDMG > 0 , sum((!grepl('[KMBkmb]', PROPDMGEXP) | !grepl('[KBMkbm]', CROPDMGEXP)))]` of which do not have the proper magnitude
+desingations.  In those instances, thousand (K) are assumed.
+
+```{r damage tally, results='hide'}
+dmgAmt <- function(value, magnitude = 'K') {
+    #returns dollar value in mulitple of thousands.
+    #If magnitude is not one of 'K', 'M' or 'B', assume 'K'.
+
+    #assumes value and magnitude are both equal length
+
+    val <- numeric(length(value))
+
+    for (i in 1:length(value)) {
+        mag <- toupper(magnitude[i])
+
+        if (!grepl('[MB]', mag) | is.na(mag)) {
+            val[i] <- value[i]
+        } else if (mag == 'M') {
+            val[i] <- value[i] * 1e3
+        } else if (mag == 'B') {
+            val[i] <- value[i] * 1e6
+        }
+    }
+
+    val
+}
+
+dtl[PROPDMG > 0, PropDmg:=dmgAmt(PROPDMG, PROPDMGEXP)]
+
+dtl[CROPDMG > 0, CropDmg:=dmgAmt(CROPDMG, CROPDMGEXP)]
+```
+
+```{r damage tally2}
+dtl[, .(PropDmg=sum(PropDmg, na.rm = T),
+        CropDmg=sum(CropDmg, na.rm = T),
+        Injuries=sum(INJURIES, na.rm = T),
+        Fatalitites=sum(FATALITIES, na.rm = T)),
+    by = STATE]
+```
+
+
 
 too many events; how about categories of events?
 
@@ -74,22 +135,22 @@ sort(dtl[, unique(EVTYPE)])
 
 
 #HUNDERSTORM WIND
-dtl[grepl('SUMMARY', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EVTYPE:='THUNDERSTORM WIND']
+dtl[grepl('summary', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EVTYPE:='Thunderstorm Wind']
 
 #HAIL
-dtl[grepl('SUMMARY', EVTYPE) & grepl('[Hh]ail', REMARKS), EVTYPE:='HAIL']
+dtl[grepl('summary', EVTYPE) & grepl('[Hh]ail', REMARKS), EVTYPE:='Hail']
 
 #FLASH FLOOD
-dtl[grepl('SUMMARY', EVTYPE) & grepl('[Ff]lash flood', REMARKS), EVTYPE:='FLASH FLOOD']
+dtl[grepl('summary', EVTYPE) & grepl('[Ff]lash flood', REMARKS), EVTYPE:='Flood']
 
 #LIGHTNING
-dtl[grepl('SUMMARY', EVTYPE) & grepl('[Ll]ightning', REMARKS), EVTYPE:='LIGHTNING']
+dtl[grepl('summary', EVTYPE) & grepl('[Ll]ightning', REMARKS), EVTYPE:='Lightning']
 
 #BLIZZARD
-dtl[grepl('SUMMARY', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EVTYPE:='BLIZZARD']
+dtl[grepl('SUMMARY', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EVTYPE:='Blizzard']
 
 #VOLCANIC ASH
-dtl[grepl('VO', EVTYPE), EVTYPE:='VOLCANIC ASH']
+dtl[grepl('^[vo]', EVTYPE), EVTYPE:='Volcanic Ash']
 
 
 ```
