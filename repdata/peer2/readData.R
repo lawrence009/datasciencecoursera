@@ -56,7 +56,7 @@ if (!exists('dtl')) {
     dtl <- dtl[, c(37, 2, 6:8, 22:28), with=F]
 }
 
-evtypes <- sort(unique(dtl$EVTYPE))
+evtype <- sort(unique(dtl$EVTYPE))
 
 
 #dtl[FATALITIES & 0 & INJURIES == 0 & PROPDMG == 0]

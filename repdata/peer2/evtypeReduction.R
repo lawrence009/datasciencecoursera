@@ -11,19 +11,19 @@ source('readData.R')
 
 # #Summary
 # #HUNDERSTORM WIND
-# events[grepl('summary', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EVTYPE:='THUNDERSTORM WIND']
+# events[grepl('summary', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EVTYPE:='Thunderstorm Wind']
 #
 # #HAIL
-# events[grepl('summary', EVTYPE) & grepl('[Hh]ail', REMARKS), EVTYPE:='HAIL']
+# events[grepl('summary', EVTYPE) & grepl('[Hh]ail', REMARKS), EVTYPE:='Hail']
 #
 # #FLASH FLOOD
-# events[grepl('summary', EVTYPE) & grepl('[Ff]lash flood', REMARKS), EVTYPE:='FLASH FLOOD']
+# events[grepl('summary', EVTYPE) & grepl('[Ff]lash flood', REMARKS), EVTYPE:='Flash Flood']
 #
 # #LIGHTNING
-# events[grepl('summary', EVTYPE) & grepl('[Ll]ightning', REMARKS), EVTYPE:='LIGHTNING']
+# events[grepl('summary', EVTYPE) & grepl('[Ll]ightning', REMARKS), EVTYPE:='Lightning']
 #
 # #blizzards
-# events[grepl('summary', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EVTYPE:='BLIZZARD']
+# events[grepl('summary', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EVTYPE:='Blizzard']
 #
 # events[grepl('summary', EVTYPE), REMARKS]
 
@@ -59,3 +59,4 @@ dmg.mapped <- dtl[which(EVTYPE %in% evmap.ok),
 dmg.summary <- as.matrix(rbind(dmg.mapped, dmg.notmapped))
 rownames(dmg.summary) <- c('mapped', 'not mapped')
 
+print(dmg.summary)

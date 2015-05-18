@@ -13,4 +13,6 @@ dt1 <- na.omit(dt0)
 
 #xyplot(mth.f~sum(PropDmgVal, na.rm = T) , data = dtl)
 
-xyplot(CropDmg~PropDmg | STATE, data = dt1, scales=list(y=list(log10),x=list(log10)))
+xyplot(CropDmg~PropDmg | STATE,
+       data = dt0,
+       scales=list(y=list(log10),x=list(log10)))

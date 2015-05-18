@@ -76,3 +76,4 @@ rownames(diff) <- c('Adjusted', 'Original')
 
 print(diff)
 
+rm(propdmg, cropdmg)
