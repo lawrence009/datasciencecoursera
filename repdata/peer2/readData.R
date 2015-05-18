@@ -61,3 +61,10 @@ evtypes <- sort(unique(dtl$EVTYPE))
 
 #dtl[FATALITIES & 0 & INJURIES == 0 & PROPDMG == 0]
 
+
+#REFNUM 605943
+# http://napavalleyregister.com/news/local/napa-flood-damage-estimate-drops-to-million/article_bc2b3e27-1a7e-5886-ada4-6da209b4a5db.html
+dtl[REFNUM == 605943, ':='(PROPDMG=13.75,
+                           PROPDMGEXP='M',
+                           CROPDMG=(114.2 - 13.75),
+                           CROPDMGEXP='M')]

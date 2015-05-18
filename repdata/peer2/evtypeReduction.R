@@ -36,19 +36,26 @@ evmap <- read.csv('EventMapping.csv',
                   na.strings = '',
                   colClasses = 'character')[2:3]
 
-evmap.ok <- evmap$EVTYPE[!is.na(evmap$EventName)]
-
 evmap.NA <- evmap$EVTYPE[is.na(evmap$EventName)]
 
-
-print(dtl[EVTYPE %in% evmap.NA, .(fatalities=sum(FATALITIES),
-                                  injuries=sum(INJURIES),
-                                  proddmg=sum(PROPDMG),
-                                  cropdmg=sum(CROPDMG))])
+evmap.ok <- evmap$EVTYPE[!is.na(evmap$EventName)]
 
 
-print(dtl[EVTYPE %in% evmap.ok, .(fatalities=sum(FATALITIES),
-                                  injuries=sum(INJURIES),
-                                  proddmg=sum(PROPDMG),
-                                  cropdmg=sum(CROPDMG))])
+
+dmg.notmapped <- dtl[which(EVTYPE %in% evmap.NA),
+                    .(fatalities=sum(FATALITIES, na.rm = T),
+                      injuries=sum(INJURIES, na.rm = T),
+                      proddmg=sum(PropDmg, na.rm = T),
+                      cropdmg=sum(CropDmg, na.rm = T))]
+
+
+dmg.mapped <- dtl[which(EVTYPE %in% evmap.ok),
+                  .(fatalities=sum(FATALITIES, na.rm = T),
+                    injuries=sum(INJURIES, na.rm = T),
+                    proddmg=sum(PropDmg, na.rm = T),
+                    cropdmg=sum(CropDmg, na.rm = T))]
+
+
+dmg.summary <- as.matrix(rbind(dmg.mapped, dmg.notmapped))
+rownames(dmg.summary) <- c('mapped', 'not mapped')
 

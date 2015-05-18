@@ -21,7 +21,7 @@ consequences?
 
 ## Loading and preprocessing the raw data
 
-```{r download and sample data, echo=FALSE, results='hide'}
+```{r download and sample data, results='hide'}
 url <- 'https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2'
 filename <- 'repdata-data-StormData.csv.bz2'
 
@@ -38,7 +38,7 @@ colClasses[ch] <- 'character'
 ```
 
 
-```{r data, cache=TRUE, echo=FALSE, message=FALSE}
+```{r data, cache=TRUE, message=FALSE}
 library(data.table)
 
 dtl <- as.data.table(read.csv(filename, na.strings = '', colClasses = colClasses))
@@ -47,7 +47,7 @@ dtl <- as.data.table(read.csv(filename, na.strings = '', colClasses = colClasses
 This data set consists of `r dim(dtl)[1]` observations and `r dim(dtl)[2]`
 variables.  The first 6 rows of the data are as below:
 
-```{r, echo=FALSE, message=FALSE}
+```{r message=FALSE}
 library(data.table)
 
 head(dtl)
@@ -74,7 +74,7 @@ Columns crucial to the analysis are:
 * CROPDMGEXP (magnitude of amount in thousand (K), million (M), or billion (B))
 
 ### Data cleansing
-```{r colnames, results='hide', echo=FALSE}
+```{r colnames, results='hide'}
 library(data.table)
 
 setnames(dtl, c(1, 35), c('STATE_FIPS', 'LONGITUDE_E'))
@@ -93,12 +93,12 @@ obs.badexp <- dtl[PROPDMG > 0 | CROPDMG > 0,
 ```
 
 Of `r obs.total` total observations (obs), `r obs.dmg` obs. contain property or
-crop damage estimates.  However, `r round(obs.badexp / obs.dmg * 100, 2) ` percent
+crop damage estimates.  However, `r round(obs.badexp / obs.dmg * 100, 2)` percent
 of which do not have the proper magnitude designations: K, M or B. In those
 instances, thousand (K) is assumed. If magnitude is specified as one of the number
 between 1 to 9, the number is used as the exponent of 10.
 
-```{r damage calc, results='hide', echo=FALSE}
+```{r damage calc, results='hide'}
 dmgAmt <- function(value, magnitude = 'K') {
     #returns dollar value in mulitple of thousands.
     #If magnitude is not one of 'K', 'M' or 'B', assume 'K'.
@@ -130,7 +130,7 @@ dtl[CROPDMG > 0, CropDmg:=dmgAmt(CROPDMG, CROPDMGEXP)]
 ```
 
 The adjustments to the affected damage estimates are summarized below:
-```{r adjust magnitude, echo=FALSE}
+```{r adjust magnitude}
 bad.propexp <- dtl[, PROPDMG > 0 & !grepl('[KMBkmb]', PROPDMGEXP)]
 
 bad.cropexp <- dtl[, CROPDMG > 0 & !grepl('[KMBkmb]', CROPDMGEXP)]
@@ -145,9 +145,15 @@ colnames(diff) <- c('Properties', 'Crops')
 rownames(diff) <- c('Adjusted', 'Original')
 
 diff
+
+diff[1,1] - diff[2,1]
+
+diff[1,1] / diff[2,1]
+
 ```
 
-```{r damage tally, echo=FALSE}
+
+```{r damage tally}
 dmg.summary <- dtl[, .('Prop Damage'=sum(PropDmg, na.rm = T),
                        'Crop Damage'=sum(CropDmg, na.rm = T),
                        Injuries=sum(INJURIES, na.rm = T),
@@ -155,13 +161,27 @@ dmg.summary <- dtl[, .('Prop Damage'=sum(PropDmg, na.rm = T),
                    by = STATE]
 
 zero.dmg <- which(rowSums(dmg.summary[, c(2:5), with=F]) == 0)
-```
 
-```{r}
 head(dmg.summary)
 ```
 
-And these states have no reported damages: `r dmg.summary$STATE[zero.dmg]`
+And these states have no reported human injuries, fatalities, property or crop
+damages: `r dmg.summary$STATE[zero.dmg]`
+
+#### 2005 New Year's Eve Napa Valley Flood
+Property and crop damages of the flood in Napa 2006 (REFNUM 605943) were
+erroneous by serveral order of magnitude. These values were corrected using
+estimated located in this [News Article][http://napavalleyregister.com/news/local/napa-flood-damage-estimate-drops-to-million/article_bc2b3e27-1a7e-5886-ada4-6da209b4a5db.html 'Title']. 
+Additional information can be found [here][http://pubs.usgs.gov/of/2006/1182/pdf/ofr2006-1182.pdf].
+
+```{r}
+#REFNUM 605943
+# http://napavalleyregister.com/news/local/napa-flood-damage-estimate-drops-to-million/article_bc2b3e27-1a7e-5886-ada4-6da209b4a5db.html
+dtl[REFNUM == 605943, ':='(PROPDMG=13.75,
+                           PROPDMGEXP='M',
+                           CROPDMG=(114.2 - 13.75),
+                           CROPDMGEXP='M')]
+```
 
 ### Dimensionality reduction (feature extraction) of EVTYPE
 
@@ -176,8 +196,18 @@ head(evtype, 30)
 
 ```
 
-Many of the event types in the data set do not match the office list of event
-names.  too many events; how about categories of events?
+Many of the EVTYPE (event types; `r dim(evtype)[1]` total) in the data set do
+not match the official list of `r dim(evlist)[1]` event names.
+
+
+
+too many events; how about categories of events?
+
+http://www.ncdc.noaa.gov/stormevents/pd01016005curr.pdf
+
+[mapping][https://github.com/lawrence009/datasciencecoursera/blob/master/repdata/peer2/EventMapping.csv]
+
+
 
 
 ```{r event type reduction, results='hide'}
@@ -204,7 +234,11 @@ dtl[grepl('^[vo]', EVTYPE), EVTYPE:='Volcanic Ash']
 
 
 
-### Assignment Instructions 
+## Results
+
+***
+
+## Assignment Instructions 
 
 The basic goal of this assignment is to explore the NOAA Storm Database and answer some basic questions about severe weather events. You must use the database to answer the questions below and show the code for your entire analysis. Your analysis can consist of tables, figures, or other summaries. You may use any R package you want to support your analysis.
 
