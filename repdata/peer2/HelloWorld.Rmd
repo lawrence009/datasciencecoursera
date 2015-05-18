@@ -145,13 +145,13 @@ colnames(diff) <- c('Properties', 'Crops')
 rownames(diff) <- c('Adjusted', 'Original')
 
 diff
-
-diff[1,1] - diff[2,1]
-
-diff[1,1] / diff[2,1]
-
 ```
 
+The adjustment resulted in `r ceiling(diff[1,1] / diff[2,1])`-fold improvement
+in property damange estimates, or $`r ceiling((diff[1,1] - diff[2,1]) / 1e3)`
+billions.
+
+#### Summary of Damage Estimates by States
 
 ```{r damage tally}
 dmg.summary <- dtl[, .('Prop Damage'=sum(PropDmg, na.rm = T),
@@ -165,23 +165,26 @@ zero.dmg <- which(rowSums(dmg.summary[, c(2:5), with=F]) == 0)
 head(dmg.summary)
 ```
 
-And these states have no reported human injuries, fatalities, property or crop
-damages: `r dmg.summary$STATE[zero.dmg]`
+And those states have no reported human injuries, fatalities, property or crop
+damages are: `r dmg.summary$STATE[zero.dmg]`
 
 #### 2005 New Year's Eve Napa Valley Flood
-Property and crop damages of the flood in Napa 2006 (REFNUM 605943) were
-erroneous by serveral order of magnitude. These values were corrected using
-estimated located in this [News Article][http://napavalleyregister.com/news/local/napa-flood-damage-estimate-drops-to-million/article_bc2b3e27-1a7e-5886-ada4-6da209b4a5db.html 'Title']. 
-Additional information can be found [here][http://pubs.usgs.gov/of/2006/1182/pdf/ofr2006-1182.pdf].
+The initial data exploration revealed that roperty and crop damage estimates of
+the flood in Napa 2006 (REFNUM 605943) were erroneous by serveral order of
+magnitude. These values were corrected using estimated located in this
+[News Article](http://napavalleyregister.com/news/local/napa-flood-damage-estimate-drops-to-million/article_bc2b3e27-1a7e-5886-ada4-6da209b4a5db.html 'Title'). 
+[News footage](https://youtu.be/OQ5S86IAsn4) and additional information from
+usgs.gov can be found [here](http://pubs.usgs.gov/of/2006/1182/pdf/ofr2006-1182.pdf).
 
-```{r}
+```{r results='hide'}
 #REFNUM 605943
-# http://napavalleyregister.com/news/local/napa-flood-damage-estimate-drops-to-million/article_bc2b3e27-1a7e-5886-ada4-6da209b4a5db.html
 dtl[REFNUM == 605943, ':='(PROPDMG=13.75,
                            PROPDMGEXP='M',
                            CROPDMG=(114.2 - 13.75),
                            CROPDMGEXP='M')]
 ```
+
+
 
 ### Dimensionality reduction (feature extraction) of EVTYPE
 
@@ -196,17 +199,12 @@ head(evtype, 30)
 
 ```
 
-Many of the EVTYPE (event types; `r dim(evtype)[1]` total) in the data set do
-not match the official list of `r dim(evlist)[1]` event names.
-
-
-
-too many events; how about categories of events?
-
-http://www.ncdc.noaa.gov/stormevents/pd01016005curr.pdf
-
-[mapping][https://github.com/lawrence009/datasciencecoursera/blob/master/repdata/peer2/EventMapping.csv]
-
+Many of the EVTYPE (event types; `r length(evtype)` total) in the data set do
+not match the [official list](http://www.ncdc.noaa.gov/stormevents/pd01016005curr.pdf)
+of `r dim(evlist)[1]` event names. Best attempt was applied to semi-manually
+pattern matched EVTYPE to the official list of events.  Where the EVTYPE is
+ambigous, the event is cross reference against REMARKS. The result of mapping
+can be found [here](https://github.com/lawrence009/datasciencecoursera/blob/master/repdata/peer2/EventMapping.csv).
 
 
 
@@ -232,6 +230,8 @@ dtl[grepl('^[vo]', EVTYPE), EVTYPE:='Volcanic Ash']
 
 ```
 
+
+too many events; how about categories of events?
 
 
 ## Results
