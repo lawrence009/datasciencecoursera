@@ -18,7 +18,7 @@ surprising.  This article illustrates one of those surprising examples.
 ## Loading and processing data
 This example uses National Emissions Inventory (NEI) database[[1]](http://www.epa.gov/ttn/chief/eiinformation.html).
 A subset of data represents PM2.5 emissions from a variety of sources in
-the United States for 1999, 2002, 2005, and 2008 is used for this demonstration.
+the United States in 1999, 2002, 2005, and 2008 is used for this demonstration.
 
 ```{r data, cache=TRUE}
 url <- 'https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip'
@@ -85,7 +85,7 @@ legend('topleft', legend=unique(df$County),
        pch = 15, col=c("lightblue","salmon"))
 ```
 
-This chart might be okay except Los Angeles far higher number of observations
+This chart might be okay except Los Angeles has far higher number of observations
 (data points):
 
 ```{r, echo=FALSE}
