@@ -53,6 +53,8 @@ if (!exists('dtl')) {
 
     events <- dtl[, c('REFNUM', 'EVTYPE', 'REMARKS'), with=F]
 
+    rmrks <-dtl[, c('REFNUM', 'REMARKS'), with=F]
+
     dtl <- dtl[, c(37, 2, 6:8, 22:28), with=F]
 }
 
@@ -68,3 +70,7 @@ dtl[REFNUM == 605943, ':='(PROPDMG=13.75,
                            PROPDMGEXP='M',
                            CROPDMG=(114.2 - 13.75),
                            CROPDMGEXP='M')]
+
+
+
+#F : F-Scale ; Fujita Scale
