@@ -37,7 +37,7 @@ g <- qplot(year,
            fill = year,
            log  = 'y',
            main = 'PM25 Emissions from Motor Vehicle Sources\nBaltimore County between 1999-2008',
-           ylab = 'Total Emmission in Tons')
+           ylab = 'Emmission in Tons')
 
 print(g)
 
