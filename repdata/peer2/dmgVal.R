@@ -70,10 +70,11 @@ cropdmg <- dtl[bad.cropexp, .(CropDmg=sum(CropDmg, na.rm = T),
 
 rm(bad.propexp, bad.cropexp)
 
-diff <- cbind(t(propdmg), t(cropdmg))
-colnames(diff) <- c('Properties', 'Crops')
-rownames(diff) <- c('Adjusted', 'Original')
+dmg.adj <- cbind(t(propdmg), t(cropdmg))
+colnames(dmg.adj) <- c('Properties', 'Crops')
+rownames(dmg.adj) <- c('Adjusted', 'Original')
 
-print(diff)
+print(dmg.adj)
 
 rm(propdmg, cropdmg)
+

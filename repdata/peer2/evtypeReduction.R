@@ -62,3 +62,13 @@ print(dmg.summary)
 
 
 dtx <- merge(dtl, evmap, by = 'EVTYPE', all.x = T)
+
+evtable <- read.csv('EventTable.csv',
+                    na.strings = '')
+
+dtx <- merge(dtx, evtable, by = 'EventName', all.x = T)
+
+
+hist((as.numeric(as.factor(dtx$EventName))))
+
+hist((as.numeric(as.factor(dtx$Element1))))

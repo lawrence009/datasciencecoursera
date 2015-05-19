@@ -1,18 +1,16 @@
-library(lattice)
 library(data.table)
+library(lattice)
 
-state.f <- as.factor(dtx$STATE)
-year.f <- as.factor(year(dtx$BGN_DATE))
-mth.f <- as.factor(month(dtx$BGN_DATE))
 
 dt0 <- transform(dtx, STATE=as.factor(STATE),
                       year=as.factor(year(BGN_DATE)),
                       month=as.factor(month(BGN_DATE)))
 
-dt0[, PropDmg:=sapply(PropDmg, function(x) if(is.na(x)) {0} else {x})]
-dt0[, CropDmg:=sapply(CropDmg, function(x) if(is.na(x)) {0} else {x})]
-dt0[, FATALITIES:=sapply(FATALITIES, function(x) if(is.na(x)) {0} else {x})]
-dt0[, INJURIES:=sapply(INJURIES, function(x) if(is.na(x)) {0} else {x})]
+dt0[is.na(PropDmg), PropDmg:=0]
+dt0[is.na(CropDmg), CropDmg:=0]
+
+dt0[is.na(FATALITIES), FATALITIES:=0]
+dt0[is.na(INJURIES),   INJURIES:=0]
 
 
 dt1 <- aggregate(cbind(econ=(PropDmg+CropDmg),

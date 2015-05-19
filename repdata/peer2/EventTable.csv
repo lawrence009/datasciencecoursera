@@ -1,15 +1,15 @@
-EventName,Element2,Element1
-Astronomical Low Tide,Water,Water
+EventName,Element1,Element2
+Astronomical Low Tide,Water,
 Avalanche,Ice,
 Blizzard,Ice,
 Coastal Flood,Ice,
-Cold/Wind Chill,Cold,
-Debris Flow,Earth,
-Dense Fog,Water,
-Dense Smoke,Fire,Air
+Cold/Wind Chill,Cold,Air
+Debris Flow,Earth,Earth
+Dense Fog,Water,Water
+Dense Smoke,Fire,Fire
 Drought,Heat,
-Dust Devil,Wind,
-Dust Storm,Wind,
+Dust Devil,Earth,Wind
+Dust Storm,Earth,Wind
 Excessive Heat,Heat,Air
 Extreme Cold/Wind Chill,Cold,Air
 Flash Flood,Water,
@@ -17,7 +17,7 @@ Flood,Water,
 Frost/Freeze,Ice,
 Funnel Cloud,Wind,
 Freezing Fog,Cold,
-Hail,Ice,
+Hail,Ice,Water
 Heat,Heat,
 Heavy Rain,Water,
 Heavy Snow,Ice,
