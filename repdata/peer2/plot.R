@@ -33,6 +33,6 @@ dt1 <- aggregate(cbind(econ=(PropDmg+CropDmg),
 
 bwplot(~econ | EventName, data = dt1)
 
-bwplot(~humn | EventName, data = dt1)
+stripplot(~humn | EventName, data = dt1)
 
 
