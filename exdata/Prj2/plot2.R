@@ -1,6 +1,8 @@
 # 2. Have total emissions from PM2.5 decreased in the Baltimore City, Maryland
 # (fips == "24510") from 1999 to 2008?
 
+library(data.table)
+
 ## Load and process data
 if (!exists('NEI')) {
     NEI <- readRDS("summarySCC_PM25.rds")

@@ -3,6 +3,8 @@
 # emissions from 1999–2008 for Baltimore City? Which have seen increases in
 # emissions from 1999–2008?
 
+library(data.table)
+
 ## Load and process data
 if (!exists('NEI')) {
     NEI <- readRDS("summarySCC_PM25.rds")
