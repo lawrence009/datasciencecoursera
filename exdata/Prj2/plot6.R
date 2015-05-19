@@ -3,10 +3,22 @@
 # (fips == "06037"). Which city has seen greater changes over time in motor
 # vehicle emissions?
 
-library(data.table)
+
+## Load and process data
+
+url <- 'https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip'
+filename <- 'exdata-data-NEI_data.zip'
+
+#check if the data file is available
+if (!file.exists(filename)) {
+    download.file(url = url, destfile = filename)
+    unzip(filename)
+}
+
+
 
 library(data.table)
-## Load and process data
+
 if (!exists('NEI')) {
     NEI <- as.data.table(readRDS("summarySCC_PM25.rds"))
     NEI$Pollutant <- NULL
@@ -44,8 +56,10 @@ g <- qplot(year,
            log  = 'y',
            main = paste0('PM25 Emissions from Motor Vehicle Sources\n',
                          'Baltimore vs. Los Angeles County between 1999-2008'),
-           ylab = 'Emmission in Tons')
-
+           ylab = 'Emmission in Tons') + 
+    geom_smooth(aes(group = 1), size = 1,
+                method = "lm", se = T,
+                color = 'grey90')
 
 print(g)
 
