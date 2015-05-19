@@ -17,18 +17,20 @@ pm25coal <- subset(NEI,
                    SCC %in% coal.sources,
                    c(Emissions, type, year))
 
+pm25coal[, year:=as.factor(year)]
+
+
 
 png('plot4.png', width = 480, height = 480)
 
-
 library(ggplot2)
 
-g <- qplot(year, Emissions+1,
+g <- qplot(year, Emissions,
            data = pm25coal,
+           fill = year,
+           geom = c('boxplot'),
            facets = . ~ type,
-           geom = c('point', 'smooth'),
            log = 'y',
-           method = 'lm',
            main = 'PM25 Emissions from Coal Sources\nUnited States between 1999-2008',
            ylab = 'Emmission in Tons')
 

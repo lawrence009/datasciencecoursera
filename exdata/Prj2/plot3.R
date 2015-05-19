@@ -14,24 +14,20 @@ if (!exists('SCC')) {
 
 
 pm25Baltimore <- subset(NEI,
-                        fips == 24510,
+                        fips == 24510 & Emissions > 0,
                         c(Emissions, type, year))
 
-# pm25Baltimore.year.total <- tapply(pm25Baltimore$Emissions, 
-#                                    pm25Baltimore$year,
-#                                    sum)
 
-
-png('plot3.png', width = 480, height = 480)
+png('plot3.png', width = 640, height = 480)
 
 
 library(ggplot2)
 
-g <- qplot(year, Emissions+1,
+g <- qplot(year, Emissions,
            data = pm25Baltimore,
-           facets = . ~ type,
            #stat = 'bin',
            geom = c('point', 'smooth'),
+           facets = . ~ type,
            log = 'y',
            method = 'lm',
            main = 'Baltimore City\nPM25 Emissions by Sources from 1999-2008',
