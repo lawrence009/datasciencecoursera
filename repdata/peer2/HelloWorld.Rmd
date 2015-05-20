@@ -251,7 +251,7 @@ If ambiguous, EVTYPE is cross-reference against REMARKS.
 ## EVTYPE summary...
 
 #HUNDERSTORM WIND
-dtl[grepl('summary', EVTYPE) & grepl('[Tt]=hunderstorm.*[Ww]ind', REMARKS), EventName:='Thunderstorm Wind']
+dtl[grepl('summary', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EventName:='Thunderstorm Wind']
 
 #HAIL
 dtl[grepl('summary', EVTYPE) & grepl('[Hh]ail', REMARKS), EventName:='Hail']
@@ -319,6 +319,7 @@ When comparing economic data, BEA further defines the states in the US into
 7. Rocky Mountain
 8. Far West
 
+The region-to-state mapping extract from BEA can be found [here](https://github.com/lawrence009/datasciencecoursera/blob/master/repdata/peer2/BureauOfEconomicAnalysisRegions.csv).
 ```{r BEA US regions}
 regions <- read.csv('BureauOfEconomicAnalysisRegions.csv')[c(3, 1)]
 colnames(regions)[1] <- 'STATE'
@@ -327,7 +328,7 @@ summary(regions)
 
 dtl <- merge(dtl, regions, by = 'STATE', all.x = T)
 
-summary(dtl)
+str(dtl[, c('STATE', 'Region'), with=F])
 ```
 
 ## Results

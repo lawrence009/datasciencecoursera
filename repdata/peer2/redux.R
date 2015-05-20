@@ -77,3 +77,12 @@ dtx <- merge(dtx, evtable, by = 'EventName', all.x = T)
 hist((as.numeric(as.factor(dtx$EventName))))
 
 hist((as.numeric(as.factor(dtx$Element1))))
+
+
+
+regions <- read.csv('BureauOfEconomicAnalysisRegions.csv')[c(3, 1)]
+colnames(regions)[1] <- 'STATE'
+
+dtx <- merge(dtx, regions, by = 'STATE', all.x = T)
+
+summary(dtx)

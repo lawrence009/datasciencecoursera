@@ -34,3 +34,15 @@ bwplot(~econ | EventName, data = dt1)
 stripplot(~humn | EventName, data = dt1)
 
 
+dt1 <- aggregate(cbind(econ=(PropDmg+CropDmg),
+                       humn=(FATALITIES+INJURIES)) ~ Element1 + Region,
+                 data = dt0, sum, na.rm = T)
+
+l <- xyplot(humn~econ | Element1*Region,
+            data = dt1
+            )
+
+print(l)
+
+
+
