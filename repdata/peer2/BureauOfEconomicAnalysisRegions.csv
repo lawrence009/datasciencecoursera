@@ -1,0 +1,52 @@
+Region,State,USPS
+Far West,Alaska,AK
+Far West,California,CA
+Far West,Hawaii,HI
+Far West,Nevada,NV
+Far West,Oregon,OR
+Far West,Washington,WA
+Great Lakes,Illinois,IL
+Great Lakes,Indiana,IN
+Great Lakes,Michigan,MI
+Great Lakes,Ohio,OH
+Great Lakes,Wisconsin,WI
+Mideast,Delaware,DE
+Mideast,District of Columbia,DC
+Mideast,Maryland,MD
+Mideast,New Jersey,NJ
+Mideast,New York,NY
+Mideast,Pennsylvania,PA
+New England,Connecticut,CT
+New England,Maine,MN
+New England,Massachusetts,MA
+New England,New Hampshire,NH
+New England,Rhode Island,RI
+New England,Vermont,VT
+Plains,Iowa,IA
+Plains,Kansas,KS
+Plains,Minnesota,MN
+Plains,Missouri,MO
+Plains,Nebraska,NE
+Plains,North Dakota,ND
+Plains,South Dakota,SD
+Rocky Mountain,Colorado,CO
+Rocky Mountain,Idaho,IA
+Rocky Mountain,Montana,MT
+Rocky Mountain,Utah,UT
+Rocky Mountain,Wyoming,WY
+Southeast,Alabama,AL
+Southeast,Arkansas,AK
+Southeast,Florida,FL
+Southeast,Georgia,GA
+Southeast,Kentucky,KY
+Southeast,Louisiana,LA
+Southeast,Mississippi,MS
+Southeast,North Carolina,NC
+Southeast,South Carolina,SC
+Southeast,Tennessee,TN
+Southeast,Virginia,VA
+Southeast,West Virginia,WV
+Southwest,Arizona,AZ
+Southwest,New Mexico,NM
+Southwest,Oklahoma,OK
+Southwest,Texas,TX
