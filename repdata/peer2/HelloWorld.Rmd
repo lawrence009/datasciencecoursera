@@ -301,6 +301,8 @@ summary(evlist)
 
 dtl <- merge(dtl, evlist, by = 'EventName', all.x = T)
 
+summary(dtl[, c('EVTYPE', 'EventName', 'Element1', 'Element2'), with=F])
+
 ```
 
 
@@ -317,12 +319,15 @@ When comparing economic data, BEA further defines the states in the US into
 7. Rocky Mountain
 8. Far West
 
-```{r BEA regions}
+```{r BEA US regions}
 regions <- read.csv('BureauOfEconomicAnalysisRegions.csv')[c(3, 1)]
 colnames(regions)[1] <- 'STATE'
 
 summary(regions)
 
+dtl <- merge(dtl, regions, by = 'STATE', all.x = T)
+
+summary(dtl)
 ```
 
 ## Results
