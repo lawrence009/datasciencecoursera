@@ -1,9 +1,15 @@
 source('readData.R')
 
-events[, EVTYPE:=dtl$EVTYPE]
+write.csv(sort(dtl[, unique(EVTYPE)]),
+          file = 'foo.csv')
+
+## to save time, make a copy of events and avoid overwriting the origial copy
+events[, EVTYPE:=dtl$EVTYPE] #reset the EVTYPE value for dev/test
+
+
 
 # #VOLCANIC ASH
-# dtl[grepl('VO', EVTYPE), EVTYPE:='VOLCANIC ASH']
+# events[grepl('vo', EVTYPE), EVTYPE:='VOLCANIC ASH']
 #
 # #WATERSPOUT
 #
@@ -24,11 +30,10 @@ events[grepl('summary', EVTYPE) & grepl('[Ll]ightning', REMARKS), EVTYPE:='light
 #blizzards
 events[grepl('summary', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EVTYPE:='blizzard']
 
-events[grepl('summary', EVTYPE), REMARKS]
+print(events[grepl('summary', EVTYPE), REMARKS]) # should be 0 row
 
 
 
-# sort(events[, unique(EVTYPE)])
 
 
 evmap <- read.csv('EventMapping.csv',

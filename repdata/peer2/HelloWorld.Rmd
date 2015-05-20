@@ -2,9 +2,10 @@
 title: "Impact of Severe Weather Events Across the United States between 1950 and 2011"
 author: "Lawrence C. Chen"
 date: "Friday, May 15, 2015"
-output: 
+output:
   html_document:
-    keep_md: true
+    keep_md: yes
+    toc: yes
 ---
 
 ## Synopsis
@@ -47,7 +48,7 @@ dtl <- as.data.table(read.csv(filename, na.strings = '', colClasses = colClasses
 This data set consists of `r dim(dtl)[1]` observations and `r dim(dtl)[2]`
 variables.  The first 6 rows of the data are as below:
 
-```{r message=FALSE}
+```{r, echo=FALSE, message=FALSE}
 library(data.table)
 
 head(dtl)
@@ -56,21 +57,13 @@ head(dtl)
 Columns crucial to the analysis are:
 
 * STATE (2-letter state designation, including the US Territories)
-
 * BGN_DATE (date which the event occurred)
-
 * EVTYPE (type of event)
-
 * FATALITIES (no. of human fatalities)
-
 * INJURIES (no. of human injuries)
-
 * PROPDMG (dollar amount of property damage)
-
 * PROPDMGEXP (magnitude of amount in thousand (K), million (M), or billion (B))
-
 * CROPDMG (dollar amount of crop damage)
-
 * CROPDMGEXP (magnitude of amount in thousand (K), million (M), or billion (B))
 
 ### Data cleansing
@@ -97,6 +90,8 @@ crop damage estimates.  However, `r round(obs.badexp / obs.dmg * 100, 2)` percen
 of which do not have the proper magnitude designations: K, M or B. In those
 instances, thousand (K) is assumed. If magnitude is specified as one of the number
 between 1 to 9, the number is used as the exponent of 10.
+
+#### Adjusting property and crop damages
 
 ```{r damage calc, results='hide'}
 dmgAmt <- function(value, magnitude = 'K') {
@@ -129,27 +124,29 @@ dtl[PROPDMG > 0, PropDmg:=dmgAmt(PROPDMG, PROPDMGEXP)]
 dtl[CROPDMG > 0, CropDmg:=dmgAmt(CROPDMG, CROPDMGEXP)]
 ```
 
-The adjustments to the affected damage estimates are summarized below:
+#### Summary from adjusting the affected damage estimates
+
 ```{r adjust magnitude}
 bad.propexp <- dtl[, PROPDMG > 0 & !grepl('[KMBkmb]', PROPDMGEXP)]
 
 bad.cropexp <- dtl[, CROPDMG > 0 & !grepl('[KMBkmb]', CROPDMGEXP)]
 
-propdmg <- dtl[bad.propexp, .(PropDmg=sum(PropDmg, na.rm = T),
-                              PROPDMG=sum(PROPDMG, na.rm = T))]
-cropdmg <- dtl[bad.cropexp, .(CropDmg=sum(CropDmg, na.rm = T),
-                              CROPDMG=sum(CROPDMG, na.rm = T))]
+propdmg <- dtl[bad.propexp, .(PROPDMG=sum(PROPDMG, na.rm = T),
+                              PropDmg=sum(PropDmg, na.rm = T))]
+cropdmg <- dtl[bad.cropexp, .(CROPDMG=sum(CROPDMG, na.rm = T),
+                              CropDmg=sum(CropDmg, na.rm = T))]
 
-diff <- cbind(t(propdmg), t(cropdmg))
-colnames(diff) <- c('Properties', 'Crops')
-rownames(diff) <- c('Adjusted', 'Original')
+dmg.summary <- cbind(t(propdmg), t(cropdmg))
+colnames(dmg.summary) <- c('Properties', 'Crops')
+rownames(dmg.summary) <- c('Original', 'Adjusted')
 
-diff
+dmg.summary
 ```
 
-The adjustment resulted in `r ceiling(diff[1,1] / diff[2,1])`-fold improvement
-in property damange estimates, or $`r ceiling((diff[1,1] - diff[2,1]) / 1e3)`
+The adjustment resulted in `r ceiling(dmg.summary[2,1] / dmg.summary[1,1])`-fold improvement
+in property damage estimates, or $`r ceiling((dmg.summary[2,1] - dmg.summary[1,1]) / 1e3)`
 billions.
+
 
 #### Summary of Damage Estimates by States
 
@@ -169,15 +166,22 @@ And those states have no reported human injuries, fatalities, property or crop
 damages are: `r dmg.summary$STATE[zero.dmg]`
 
 #### 2005 New Year's Eve Napa Valley Flood
-The initial data exploration revealed that roperty and crop damage estimates of
-the flood in Napa 2006 (REFNUM 605943) were erroneous by serveral order of
-magnitude. These values were corrected using estimated located in this
+The initial data exploration revealed that property and crop damage estimates of
+the flood in Napa 2006 (REFNUM 605943) were erroneous by several order of
+magnitude.
+
+```{r napa original estimates}
+#REFNUM 605943 original estimates
+dtl[REFNUM == 605943, c('PROPDMG', 'PROPDMGEXP', 'CROPDMG', 'CROPDMGEXP'), with=F]
+```
+
+ These values were corrected using estimated located in this
 [News Article](http://napavalleyregister.com/news/local/napa-flood-damage-estimate-drops-to-million/article_bc2b3e27-1a7e-5886-ada4-6da209b4a5db.html 'Title'). 
 [News footage](https://youtu.be/OQ5S86IAsn4) and additional information from
 usgs.gov can be found [here](http://pubs.usgs.gov/of/2006/1182/pdf/ofr2006-1182.pdf).
 
-```{r results='hide'}
-#REFNUM 605943
+```{r napa, results='hide'}
+#REFNUM 605943 correction
 dtl[REFNUM == 605943, ':='(PROPDMG=13.75,
                            PROPDMGEXP='M',
                            CROPDMG=(114.2 - 13.75),
@@ -202,37 +206,124 @@ head(evtype, 30)
 Many of the EVTYPE (event types; `r length(evtype)` total) in the data set do
 not match the [official list](http://www.ncdc.noaa.gov/stormevents/pd01016005curr.pdf)
 of `r dim(evlist)[1]` event names. Best attempt was applied to semi-manually
-pattern matched EVTYPE to the official list of events.  Where the EVTYPE is
-ambigous, the event is cross reference against REMARKS. The result of mapping
-can be found [here](https://github.com/lawrence009/datasciencecoursera/blob/master/repdata/peer2/EventMapping.csv).
+pattern-match EVTYPE to the official list of events.
 
-
-
-```{r event type reduction, results='hide'}
-#HUNDERSTORM WIND
-dtl[grepl('summary', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EVTYPE:='Thunderstorm Wind']
-
-#HAIL
-dtl[grepl('summary', EVTYPE) & grepl('[Hh]ail', REMARKS), EVTYPE:='Hail']
-
-#FLASH FLOOD
-dtl[grepl('summary', EVTYPE) & grepl('[Ff]lash flood', REMARKS), EVTYPE:='Flood']
-
-#LIGHTNING
-dtl[grepl('summary', EVTYPE) & grepl('[Ll]ightning', REMARKS), EVTYPE:='Lightning']
-
-#BLIZZARD
-dtl[grepl('SUMMARY', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EVTYPE:='Blizzard']
-
+```
+## EVTYPE text pattern 
 #VOLCANIC ASH
 dtl[grepl('^[vo]', EVTYPE), EVTYPE:='Volcanic Ash']
 
+#HAIL
+dtl[grepl('^hail', EVTYPE), EVTYPE:='Hail']
+
+#HIGH WIND
+dtl[grepl('^hight wind', EVTYPE), EVTYPE:='High Wind']
+
+#HURRICANE
+dtl[grepl('^hurricane', EVTYPE), EVTYPE:='Hurricane (Typhoon)']
+```
+... however matching EVTYPE and maintaining the code this way gets tedious quickly.
+A pragmatic alternative approach is to alphabetically sort and save the list
+unique EVTYPE to a csv file first.
+
+```{r write foo.csv}
+write.csv(sort(dtl[, unique(EVTYPE)]), file = 'foo.csv')
+```
+
+Then the official names of events are assigned to the adjacent column to produce
+the a EVTYPE-to-EventName mapping file found [here](https://github.com/lawrence009/datasciencecoursera/blob/master/repdata/peer2/EventMapping.csv).
+
+```{r merge evmap}
+evmap <- read.csv('EventMapping.csv', na.strings = '', colClasses = 'character')[2:3]
+
+#What percent of EVTYPE is not mapped
+sum(is.na(evmap)) / length(evtype)
+
+#append the official event name
+dtl <- merge(dtl, evmap, by = 'EVTYPE', all.x = T)
+
+head(dtl[, c('EVTYPE', 'EventName'), with=F])
+```
+
+If ambiguous, EVTYPE is cross-reference against REMARKS.
+
+```{r grepl EVTYPE REMARK, results='hide'}
+## EVTYPE summary...
+
+#HUNDERSTORM WIND
+dtl[grepl('summary', EVTYPE) & grepl('[Tt]=hunderstorm.*[Ww]ind', REMARKS), EventName:='Thunderstorm Wind']
+
+#HAIL
+dtl[grepl('summary', EVTYPE) & grepl('[Hh]ail', REMARKS), EventName:='Hail']
+
+#FLASH FLOOD
+dtl[grepl('summary', EVTYPE) & grepl('[Ff]lash flood', REMARKS), EventName:='Flood']
+
+#LIGHTNING
+dtl[grepl('summary', EVTYPE) & grepl('[Ll]ightning', REMARKS), EventName:='Lightning']
+
+#BLIZZARD
+dtl[grepl('summary', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EventName:='Blizzard']
+
+```
+
+#### Summary of EVTYPE extraction
+
+```{r mapping assessment}
+
+dmg.notmapped <- dtl[is.na(EventName),
+                    .(fatalities=sum(FATALITIES, na.rm = T),
+                      injuries=sum(INJURIES, na.rm = T),
+                      proddmg=sum(PropDmg, na.rm = T),
+                      cropdmg=sum(CropDmg, na.rm = T))]
+
+
+dmg.mapped <- dtl[!is.na(EventName),
+                  .(fatalities=sum(FATALITIES, na.rm = T),
+                    injuries=sum(INJURIES, na.rm = T),
+                    proddmg=sum(PropDmg, na.rm = T),
+                    cropdmg=sum(CropDmg, na.rm = T))]
+
+
+dmg.summary <- as.matrix(rbind(dmg.mapped, dmg.notmapped))
+rownames(dmg.summary) <- c('mapped', 'not mapped')
+
+dmg.summary
+
+dmg.notmapped / dmg.mapped
+```
+
+Weather events can also be further reduced using key weather elements to enhance
+the analysis.
+
+```{r elements}
+summary(evlist)
+
+dtl <- merge(dtl, evlist, by = 'EventName', all.x = T)
 
 ```
 
 
-too many events; how about categories of events?
+#### Bureau of Economic Analysis (BEA)
+When comparing economic data, BEA further defines the states in the US into
+[8 regions](http://bea.gov/regional/docs/regions.cfm):
 
+1. New England
+2. Mideast
+3. Great Lakes
+4. Plains
+5. Southeast
+6. Southwest
+7. Rocky Mountain
+8. Far West
+
+```{r BEA regions}
+regions <- read.csv('BureauOfEconomicAnalysisRegions.csv')[c(3, 1)]
+colnames(regions)[1] <- 'STATE'
+
+summary(regions)
+
+```
 
 ## Results
 
