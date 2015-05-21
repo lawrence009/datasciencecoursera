@@ -1,29 +1,25 @@
+# proprty damange dotplot
+
 library(data.table)
 library(lattice)
 
+#casuality mulitplier
+lamda <- 100
 
-dt0 <- transform(dtx, year=as.factor(year(BGN_DATE)),
-                      month=as.factor(month(BGN_DATE)))
+dt0 <- transform(dtx, econ=(PropDmg + CropDmg),
+                      humn=(FATALITIES*lamda + INJURIES),
+                      year=as.factor(year(BGN_DATE)),
+                      month=as.factor(month(BGN_DATE))
+                 )
 
-
-dt1 <- aggregate(cbind(econ=(PropDmg+CropDmg),
-                       humn=(FATALITIES+INJURIES)) ~ EventName + STATE + year + month,
-                 data = dt0, sum, na.rm = T)
-
-bwplot(~econ | EventName, data = dt1)
-
-stripplot(~humn | EventName, data = dt1)
-
-
-dt1 <- aggregate(cbind(econ=(PropDmg+CropDmg),
-                       humn=(FATALITIES+INJURIES)) ~ Element1 + Region,
-                 data = dt0, sum, na.rm = T)
-
-l <- xyplot(humn~econ | Element1*Region,
-            data = dt1
-            )
-
-print(l)
+p <- dotplot(Element1~econ | Region, data = dt0[econ > 0],
+             par.strip.text=list(cex=0.9),
+             #xlim = c(0, 1e7),
+             scales=list(cex = 0.9))
 
 
+print(p)
 
+
+setorder(dt0, econ)
+tail(dt0, 25)

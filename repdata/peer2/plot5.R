@@ -12,7 +12,7 @@ dt0 <- transform(dtx, econ=(PropDmg + CropDmg),
                       month=as.factor(month(BGN_DATE))
                  )
 
-p <- dotplot(Element1~humn | Region, data = dt0[humn > 0],
+p <- bwplot(Element1~humn | Region, data = dt0[humn > 0],
              main = 'Human Casulities (unadjusted figures)')
 
 print(p)
@@ -20,3 +20,10 @@ print(p)
 
 setorder(dt0, humn)
 dt0
+
+dt1 <- aggregate(data = dtx, FUN = sum,
+                 INJURIES ~ Element1 + Region)
+
+
+barchart(Element1~INJURIES | Region, data = dt1,
+             main = 'Human Casulities (unadjusted figures)')

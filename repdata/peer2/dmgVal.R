@@ -59,10 +59,10 @@ dtl[, .(PropDmg=sum(PropDmg, na.rm = T),
 
 
 
-bad.propexp <- dtl[, PROPDMG > 0 & !grepl('[KMBkmb]', PROPDMGEXP)]
+bad.propexp <- dtl[, PROPDMG > 0 & grepl('[^KMBkmb]', PROPDMGEXP)]
 
 
-bad.cropexp <- dtl[, CROPDMG > 0 & !grepl('[KMBkmb]', CROPDMGEXP)]
+bad.cropexp <- dtl[, CROPDMG > 0 & grepl('[^KMBkmb]', CROPDMGEXP)]
 
 
 propdmg <- dtl[bad.propexp, .(PropDmg=sum(PropDmg, na.rm = T),

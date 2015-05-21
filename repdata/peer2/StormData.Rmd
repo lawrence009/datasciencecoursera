@@ -12,9 +12,18 @@ output:
 
 # Synopsis
 
-where did you get the data
+In 2005, the destructive prower of [Hurricane Katrina](http://en.wikipedia.org/wiki/Hurricane_Katrina) brought an estimated $108 billion damage to properties along central Florida and
+Texas and significant number of human casuality in New Orleans, Louisiana.  
 
-Research questions:
+The [Great Flood of 1993](http://en.wikipedia.org/wiki/Great_Flood_of_1993) along
+the Mississippi and Missouri river last nearly 200 days with damages estimated
+between $15-20 billion.  
+
+According to the [NOAA Storm Database](http://www.ncdc.noaa.gov/stormevents/ftp.jsp),
+states in the Southeast and Southwest are most suspectible to severe storm and
+and flood related weather resulting in billions of properties damages. 
+
+
 
 * Across the United States, which types of events (as indicated in the EVTYPE
 variable) are most harmful with respect to population health?
@@ -129,9 +138,9 @@ dts[CROPDMG > 0, CropDmg:=dmgAmt(CROPDMG, CROPDMGEXP)]
 ### Summary from adjusting the affected damage estimates
 
 ```{r adjust magnitude}
-bad.propexp <- dts[, PROPDMG > 0 & !grepl('[KMBkmb]', PROPDMGEXP)]
+bad.propexp <- dts[, PROPDMG > 0 & grepl('[^KBMkmb]', PROPDMGEXP)]
 
-bad.cropexp <- dts[, CROPDMG > 0 & !grepl('[KMBkmb]', CROPDMGEXP)]
+bad.cropexp <- dts[, CROPDMG > 0 & grepl('[^KMBkmb]', CROPDMGEXP)]
 
 propdmg <- dts[bad.propexp, .(PROPDMG=sum(PROPDMG, na.rm = T),
                               PropDmg=sum(PropDmg, na.rm = T))]
@@ -145,9 +154,11 @@ rownames(dmg.summary) <- c('Original', 'Adjusted')
 dmg.summary
 ```
 
-The adjustment resulted in `r ceiling(dmg.summary[2,1] / dmg.summary[1,1])`-fold improvement
-in property damage estimates, or $`r ceiling((dmg.summary[2,1] - dmg.summary[1,1]) / 1e3)`
-billions.
+The adjustment resulted in `r ceiling(dmg.summary[2,1] / dmg.summary[1,1])`-fold
+improvement in property damage estimates, or $`r ceiling((dmg.summary[2,1] - dmg.summary[1,1]) / 1e3)`
+billions, and in `r ceiling(dmg.summary[2,2] / dmg.summary[1,2])`-fold
+improvement in crop damage estimates,
+or $`r ceiling((dmg.summary[2,2] - dmg.summary[1,2]) / 1e3)` billions.
 
 
 ### Summary of damage estimates by states
@@ -219,7 +230,7 @@ dts[grepl('^vo', EVTYPE), EVTYPE:='Volcanic Ash']
 dts[grepl('^hail', EVTYPE), EVTYPE:='Hail']
 
 #HIGH WIND
-dts[grepl('^hight wind', EVTYPE), EVTYPE:='High Wind']
+dts[grepl('^high wind', EVTYPE), EVTYPE:='High Wind']
 
 #HURRICANE
 dts[grepl('^hurricane', EVTYPE), EVTYPE:='Hurricane (Typhoon)']
@@ -339,6 +350,32 @@ summary(dts[, c('STATE', 'Region'), with=F])
 
 # Results
 
+```{r fig1}
+library(lattice)
+
+#casuality mulitplier
+lamda <- 100
+
+dt0 <- transform(dtx, econ=(PropDmg + CropDmg),
+                      humn=(FATALITIES*lamda + INJURIES),
+                      year=as.factor(year(BGN_DATE)),
+                      month=as.factor(month(BGN_DATE))
+                 )
+
+dotplot(Element1~econ | Region, data = dt0[econ > 0],
+        par.strip.text=list(cex=0.8),
+        xlim = c(0, 1e7))
+
+```
+
+```{r fig2}
+
+dotplot(Element1~humn | Region, data = dt0[humn > 0],
+        par.strip.text=list(cex=0.8))
+
+```
+
+
 ***
 
 # Assignment Instructions 
@@ -378,16 +415,3 @@ Your analysis must have no more than three figures. Figures may have multiple pl
 
 You must show all your code for the work in your analysis document. This may make the document a bit verbose, but that is okay. In general, you should ensure that echo = TRUE for every code chunk (this is the default setting in knitr).
 
-###Publishing Your Analysis
-
-For this assignment you will need to publish your analysis on RPubs.com. If you do not already have an account, then you will have to create a new account. After you have completed writing your analysis in RStudio, you can publish it to RPubs by doing the following:
-
-In RStudio, make sure your R Markdown document (.Rmd) document is loaded in the editor
-
-Click the Knit HTML button in the doc toolbar to preview your document.
-
-In the preview window, click the Publish button.
-
-Once your document is published to RPubs, you should get a unique URL to that document. Make a note of this URL as you will need it to submit your assignment.
-
-NOTE: If you are having trouble connecting with RPubs due to proxy-related or other issues, you can upload your final analysis document file as a PDF to Coursera instead.

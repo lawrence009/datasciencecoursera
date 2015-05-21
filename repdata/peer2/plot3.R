@@ -1,22 +1,22 @@
+# human casuality dotplot
+
 library(data.table)
 library(lattice)
 
+#casuality mulitplier
+lamda <- 100
 
-dt0 <- transform(dtx, STATE=as.factor(STATE),
+dt0 <- transform(dtx, econ=(PropDmg + CropDmg),
+                      humn=(FATALITIES*lamda + INJURIES),
                       year=as.factor(year(BGN_DATE)),
-                      month=as.factor(month(BGN_DATE)))
+                      month=as.factor(month(BGN_DATE))
+                 )
 
-dt0[is.na(PropDmg), PropDmg:=0]
-dt0[is.na(CropDmg), CropDmg:=0]
+p <- dotplot(Element1~humn | Region, data = dt0[humn > 0],
+             main = 'Human Casulities (adjusted figures)')
 
-dt0[is.na(FATALITIES), FATALITIES:=0]
-dt0[is.na(INJURIES),   INJURIES:=0]
+print(p)
 
 
-dt1 <- aggregate(cbind(econ=(PropDmg+CropDmg),
-                       humn=(FATALITIES+INJURIES)) ~ EventName + STATE + year + month,
-                 data = dt0, sum, na.rm = T)
-
-bwplot(~econ | EventName, data = dt1)
-
-stripplot(~humn | EventName, data = dt1)
+setorder(dt0, humn)
+dt0
