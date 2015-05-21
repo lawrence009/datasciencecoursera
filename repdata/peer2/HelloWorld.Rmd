@@ -150,7 +150,7 @@ in property damage estimates, or $`r ceiling((dmg.summary[2,1] - dmg.summary[1,1
 billions.
 
 
-### Summary of Damage Estimates by States
+### Summary of damage estimates by states
 
 ```{r damage tally}
 dmg.summary <- dtl[, .('Prop Damage'=sum(PropDmg, na.rm = T),
@@ -213,7 +213,7 @@ pattern-match EVTYPE to the official list of events.
 ```
 ## EVTYPE text pattern 
 #VOLCANIC ASH
-dtl[grepl('^[vo]', EVTYPE), EVTYPE:='Volcanic Ash']
+dtl[grepl('^vo', EVTYPE), EVTYPE:='Volcanic Ash']
 
 #HAIL
 dtl[grepl('^hail', EVTYPE), EVTYPE:='Hail']
@@ -253,19 +253,19 @@ Where ambiguous, EVTYPE is cross-reference against REMARKS.
 ## EVTYPE summary...
 
 #HUNDERSTORM WIND
-dtl[grepl('summary', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EventName:='Thunderstorm Wind']
+dtl[grepl('^summary', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EventName:='Thunderstorm Wind']
 
 #HAIL
-dtl[grepl('summary', EVTYPE) & grepl('[Hh]ail', REMARKS), EventName:='Hail']
+dtl[grepl('^summary', EVTYPE) & grepl('[Hh]ail', REMARKS), EventName:='Hail']
 
 #FLASH FLOOD
-dtl[grepl('summary', EVTYPE) & grepl('[Ff]lash flood', REMARKS), EventName:='Flood']
+dtl[grepl('^summary', EVTYPE) & grepl('[Ff]lash flood', REMARKS), EventName:='Flood']
 
 #LIGHTNING
-dtl[grepl('summary', EVTYPE) & grepl('[Ll]ightning', REMARKS), EventName:='Lightning']
+dtl[grepl('^summary', EVTYPE) & grepl('[Ll]ightning', REMARKS), EventName:='Lightning']
 
 #BLIZZARD
-dtl[grepl('summary', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EventName:='Blizzard']
+dtl[grepl('^summary', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EventName:='Blizzard']
 
 ```
 
@@ -296,10 +296,10 @@ dmg.notmapped / dmg.mapped
 ```
 
 
-### ...
+### Key weather elements
 
 Weather events can also be further reduced using key weather elements to enhance
-the analysis.
+the analysis: `r sort(unique(evlist$Element1))`
 
 ```{r elements}
 summary(evlist) # list of official event names and the associated key elements
@@ -333,7 +333,7 @@ summary(regions)
 
 dtl <- merge(dtl, regions, by = 'STATE', all.x = T)
 
-str(dtl[, c('STATE', 'Region'), with=F])
+summary(dtl[, c('STATE', 'Region'), with=F])
 ```
 
 # Results

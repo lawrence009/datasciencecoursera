@@ -15,22 +15,24 @@ events[, EVTYPE:=dtl$EVTYPE] #reset the EVTYPE value for dev/test
 #
 
 # #Summary
+evtype.summary <- grep('^summary', events$EVTYPE)
+
 #thunderstorm wind
-events[grepl('summary', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EVTYPE:='thunderstorm Wind']
+events[grepl('^summary', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EVTYPE:='Thunderstorm Wind']
 
 #hail
-events[grepl('summary', EVTYPE) & grepl('[Hh]ail', REMARKS), EVTYPE:='hail']
+events[grepl('^summary', EVTYPE) & grepl('[Hh]ail', REMARKS), EVTYPE:='Hail']
 
 #flashflood
-events[grepl('summary', EVTYPE) & grepl('[Ff]lash flood', REMARKS), EVTYPE:='flash Flood']
+events[grepl('^summary', EVTYPE) & grepl('[Ff]lash flood', REMARKS), EVTYPE:='Flash Flood']
 
 #lightning
-events[grepl('summary', EVTYPE) & grepl('[Ll]ightning', REMARKS), EVTYPE:='lightning']
+events[grepl('^summary', EVTYPE) & grepl('[Ll]ightning', REMARKS), EVTYPE:='Lightning']
 
 #blizzards
-events[grepl('summary', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EVTYPE:='blizzard']
+events[grepl('^summary', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EVTYPE:='Blizzard']
 
-print(events[grepl('summary', EVTYPE), REMARKS]) # should be 0 row
+print(events[grepl('^summary', EVTYPE), REMARKS]) # should be 0 row
 
 
 

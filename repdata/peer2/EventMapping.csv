@@ -885,7 +885,7 @@ ROW,EVTYPE,EventName
 884,wind storm,Thunderstorm Wind
 885,wind/hail,Thunderstorm Wind
 886,winds,Thunderstorm Wind
-887,winter mix,
+887,winter mix,Winter Weather
 888,winter storm,Winter Storm
 889,winter storm high winds,Winter Storm
 890,winter storm/high wind,Winter Storm
@@ -894,6 +894,6 @@ ROW,EVTYPE,EventName
 893,winter weather,Winter Weather
 894,winter weather mix,Winter Weather
 895,winter weather/mix,Winter Weather
-896,wintery mix,
-897,wintry mix,
+896,wintery mix,Winter Weather
+897,wintry mix,Winter Weather
 898,wnd,Thunderstorm Wind
