@@ -1,3 +1,5 @@
+#script to read storm data for inital exploration and transform
+
 library(data.table)
 
 url <- 'https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2'
@@ -58,10 +60,11 @@ if (!exists('dtl')) {
     dtl <- dtl[, c(37, 2, 6:8, 22:28), with=F]
 }
 
-evtype <- sort(unique(dtl$EVTYPE))
 
+#use this as the starting point for mapping official event name
+write.table(sort(unique(dtl$EVTYPE)),
+            'foo.csv', sep =',', col.names = c('EVTYPE'), row.names = F)
 
-#dtl[FATALITIES & 0 & INJURIES == 0 & PROPDMG == 0]
 
 
 #REFNUM 605943

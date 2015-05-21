@@ -1,3 +1,5 @@
+# script to calculate property and crop damage est. based on magnitude field
+
 library(data.table)
 
 mag <- function(x) {

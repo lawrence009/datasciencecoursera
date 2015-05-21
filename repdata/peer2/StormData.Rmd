@@ -44,16 +44,16 @@ colClasses[ch] <- 'character'
 ```{r data, cache=TRUE, message=FALSE}
 library(data.table)
 
-dtl <- as.data.table(read.csv(filename, na.strings = '', colClasses = colClasses))
+dts <- as.data.table(read.csv(filename, na.strings = '', colClasses = colClasses))
 ```
 
-This data set consists of `r dim(dtl)[1]` observations and `r dim(dtl)[2]`
+This data set consists of `r dim(dts)[1]` observations and `r dim(dts)[2]`
 variables.  The first 6 rows of the data are as below:
 
 ```{r, echo=FALSE, message=FALSE}
 library(data.table)
 
-head(dtl)
+head(dts)
 ```
 
 Columns crucial to the analysis are:
@@ -72,16 +72,16 @@ Columns crucial to the analysis are:
 ```{r colnames, results='hide'}
 library(data.table)
 
-setnames(dtl, c(1, 35), c('STATE_FIPS', 'LONGITUDE_E'))
+setnames(dts, c(1, 35), c('STATE_FIPS', 'LONGITUDE_E'))
 
-dtl[, ':='(STATE_FIPS =as.integer(STATE_FIPS),
+dts[, ':='(STATE_FIPS =as.integer(STATE_FIPS),
            BGN_DATE   =as.IDate(BGN_DATE, '%m/%d/%Y'),
            EVTYPE     =tolower(EVTYPE),           
            REFNUM     =as.integer(REFNUM))]
 
-obs.total <- dim(dtl)[1]
-obs.dmg <- dim(dtl[PROPDMG > 0 | CROPDMG > 0])[1]
-obs.badexp <- dtl[PROPDMG > 0 | CROPDMG > 0,
+obs.total <- dim(dts)[1]
+obs.dmg <- dim(dts[PROPDMG > 0 | CROPDMG > 0])[1]
+obs.badexp <- dts[PROPDMG > 0 | CROPDMG > 0,
                   sum((!grepl('[KMBkmb]', PROPDMGEXP) |
                            !grepl('[KBMkbm]', CROPDMGEXP)))]
 
@@ -121,21 +121,21 @@ dmgAmt <- function(value, magnitude = 'K') {
     val
 }
 
-dtl[PROPDMG > 0, PropDmg:=dmgAmt(PROPDMG, PROPDMGEXP)]
+dts[PROPDMG > 0, PropDmg:=dmgAmt(PROPDMG, PROPDMGEXP)]
 
-dtl[CROPDMG > 0, CropDmg:=dmgAmt(CROPDMG, CROPDMGEXP)]
+dts[CROPDMG > 0, CropDmg:=dmgAmt(CROPDMG, CROPDMGEXP)]
 ```
 
 ### Summary from adjusting the affected damage estimates
 
 ```{r adjust magnitude}
-bad.propexp <- dtl[, PROPDMG > 0 & !grepl('[KMBkmb]', PROPDMGEXP)]
+bad.propexp <- dts[, PROPDMG > 0 & !grepl('[KMBkmb]', PROPDMGEXP)]
 
-bad.cropexp <- dtl[, CROPDMG > 0 & !grepl('[KMBkmb]', CROPDMGEXP)]
+bad.cropexp <- dts[, CROPDMG > 0 & !grepl('[KMBkmb]', CROPDMGEXP)]
 
-propdmg <- dtl[bad.propexp, .(PROPDMG=sum(PROPDMG, na.rm = T),
+propdmg <- dts[bad.propexp, .(PROPDMG=sum(PROPDMG, na.rm = T),
                               PropDmg=sum(PropDmg, na.rm = T))]
-cropdmg <- dtl[bad.cropexp, .(CROPDMG=sum(CROPDMG, na.rm = T),
+cropdmg <- dts[bad.cropexp, .(CROPDMG=sum(CROPDMG, na.rm = T),
                               CropDmg=sum(CropDmg, na.rm = T))]
 
 dmg.summary <- cbind(t(propdmg), t(cropdmg))
@@ -153,7 +153,7 @@ billions.
 ### Summary of damage estimates by states
 
 ```{r damage tally}
-dmg.summary <- dtl[, .('Prop Damage'=sum(PropDmg, na.rm = T),
+dmg.summary <- dts[, .('Prop Damage'=sum(PropDmg, na.rm = T),
                        'Crop Damage'=sum(CropDmg, na.rm = T),
                        Injuries=sum(INJURIES, na.rm = T),
                        Fatalitites=sum(FATALITIES, na.rm = T)),
@@ -174,7 +174,7 @@ magnitude.
 
 ```{r napa original estimates}
 #REFNUM 605943 original estimates
-dtl[REFNUM == 605943, c('PROPDMG', 'PROPDMGEXP', 'CROPDMG', 'CROPDMGEXP'), with=F]
+dts[REFNUM == 605943, c('PROPDMG', 'PROPDMGEXP', 'CROPDMG', 'CROPDMGEXP'), with=F]
 ```
 
  These values were corrected using estimated located in this
@@ -184,7 +184,7 @@ usgs.gov can be found [here](http://pubs.usgs.gov/of/2006/1182/pdf/ofr2006-1182.
 
 ```{r napa, results='hide'}
 #REFNUM 605943 correction
-dtl[REFNUM == 605943, ':='(PROPDMG=13.75,
+dts[REFNUM == 605943, ':='(PROPDMG=13.75,
                            PROPDMGEXP='M',
                            CROPDMG=(114.2 - 13.75),
                            CROPDMGEXP='M')]
@@ -199,7 +199,7 @@ dtl[REFNUM == 605943, ':='(PROPDMG=13.75,
 evlist <- read.csv('EventTable.csv', na.strings='')
 
 # Event types from the data set
-evtype <- sort(dtl[, unique(EVTYPE)])
+evtype <- sort(dts[, unique(EVTYPE)])
 
 head(evtype, 30)
 
@@ -213,23 +213,24 @@ pattern-match EVTYPE to the official list of events.
 ```
 ## EVTYPE text pattern 
 #VOLCANIC ASH
-dtl[grepl('^vo', EVTYPE), EVTYPE:='Volcanic Ash']
+dts[grepl('^vo', EVTYPE), EVTYPE:='Volcanic Ash']
 
 #HAIL
-dtl[grepl('^hail', EVTYPE), EVTYPE:='Hail']
+dts[grepl('^hail', EVTYPE), EVTYPE:='Hail']
 
 #HIGH WIND
-dtl[grepl('^hight wind', EVTYPE), EVTYPE:='High Wind']
+dts[grepl('^hight wind', EVTYPE), EVTYPE:='High Wind']
 
 #HURRICANE
-dtl[grepl('^hurricane', EVTYPE), EVTYPE:='Hurricane (Typhoon)']
+dts[grepl('^hurricane', EVTYPE), EVTYPE:='Hurricane (Typhoon)']
 ```
 ... however matching EVTYPE and maintaining the code this way gets tedious quickly.
 A pragmatic alternative approach is to alphabetically sort and save the list
 unique EVTYPE to a csv file first.
 
 ```{r write foo.csv}
-write.csv(sort(dtl[, unique(EVTYPE)]), file = 'foo.csv')
+write.table(sort(unique(dtl$EVTYPE)),
+            'foo.csv', sep =',', col.names = c('EVTYPE'), row.names = F)
 ```
 
 Then the official names of events are assigned to the adjacent column to produce
@@ -242,9 +243,9 @@ evmap <- read.csv('EventMapping.csv', na.strings = '', colClasses = 'character')
 sum(is.na(evmap)) / length(evtype)
 
 #append the official event name
-dtl <- merge(dtl, evmap, by = 'EVTYPE', all.x = T)
+dts <- merge(dts, evmap, by = 'EVTYPE', all.x = T)
 
-head(dtl[, c('EVTYPE', 'EventName'), with=F])
+head(dts[, c('EVTYPE', 'EventName'), with=F])
 ```
 
 Where ambiguous, EVTYPE is cross-reference against REMARKS.
@@ -253,19 +254,19 @@ Where ambiguous, EVTYPE is cross-reference against REMARKS.
 ## EVTYPE summary...
 
 #HUNDERSTORM WIND
-dtl[grepl('^summary', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EventName:='Thunderstorm Wind']
+dts[grepl('^summary', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EventName:='Thunderstorm Wind']
 
 #HAIL
-dtl[grepl('^summary', EVTYPE) & grepl('[Hh]ail', REMARKS), EventName:='Hail']
+dts[grepl('^summary', EVTYPE) & grepl('[Hh]ail', REMARKS), EventName:='Hail']
 
 #FLASH FLOOD
-dtl[grepl('^summary', EVTYPE) & grepl('[Ff]lash flood', REMARKS), EventName:='Flood']
+dts[grepl('^summary', EVTYPE) & grepl('[Ff]lash flood', REMARKS), EventName:='Flood']
 
 #LIGHTNING
-dtl[grepl('^summary', EVTYPE) & grepl('[Ll]ightning', REMARKS), EventName:='Lightning']
+dts[grepl('^summary', EVTYPE) & grepl('[Ll]ightning', REMARKS), EventName:='Lightning']
 
 #BLIZZARD
-dtl[grepl('^summary', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EventName:='Blizzard']
+dts[grepl('^summary', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EventName:='Blizzard']
 
 ```
 
@@ -273,14 +274,14 @@ dtl[grepl('^summary', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EventName:='Blizz
 
 ```{r mapping assessment}
 
-dmg.notmapped <- dtl[is.na(EventName),
+dmg.notmapped <- dts[is.na(EventName),
                     .(fatalities=sum(FATALITIES, na.rm = T),
                       injuries=sum(INJURIES, na.rm = T),
                       proddmg=sum(PropDmg, na.rm = T),
                       cropdmg=sum(CropDmg, na.rm = T))]
 
 
-dmg.mapped <- dtl[!is.na(EventName),
+dmg.mapped <- dts[!is.na(EventName),
                   .(fatalities=sum(FATALITIES, na.rm = T),
                     injuries=sum(INJURIES, na.rm = T),
                     proddmg=sum(PropDmg, na.rm = T),
@@ -304,9 +305,9 @@ the analysis: `r sort(unique(evlist$Element1))`
 ```{r elements}
 summary(evlist) # list of official event names and the associated key elements
 
-dtl <- merge(dtl, evlist, by = 'EventName', all.x = T)
+dts <- merge(dts, evlist, by = 'EventName', all.x = T)
 
-summary(dtl[, c('EVTYPE', 'EventName', 'Element1', 'Element2'), with=F])
+summary(dts[, c('EVTYPE', 'EventName', 'Element1', 'Element2'), with=F])
 
 ```
 
@@ -331,9 +332,9 @@ colnames(regions)[1] <- 'STATE'
 
 summary(regions)
 
-dtl <- merge(dtl, regions, by = 'STATE', all.x = T)
+dts <- merge(dts, regions, by = 'STATE', all.x = T)
 
-summary(dtl[, c('STATE', 'Region'), with=F])
+summary(dts[, c('STATE', 'Region'), with=F])
 ```
 
 # Results
