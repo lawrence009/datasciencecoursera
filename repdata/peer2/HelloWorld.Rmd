@@ -5,10 +5,12 @@ date: "Friday, May 15, 2015"
 output:
   html_document:
     keep_md: yes
+    number_sections: yes
     toc: yes
+    toc_depth: 3
 ---
 
-## Synopsis
+# Synopsis
 
 where did you get the data
 
@@ -20,7 +22,7 @@ variable) are most harmful with respect to population health?
 * Across the United States, which types of events have the greatest economic
 consequences?
 
-## Loading and preprocessing the raw data
+# Loading and preprocessing the raw data
 
 ```{r download and sample data, results='hide'}
 url <- 'https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2'
@@ -66,7 +68,7 @@ Columns crucial to the analysis are:
 * CROPDMG (dollar amount of crop damage)
 * CROPDMGEXP (magnitude of amount in thousand (K), million (M), or billion (B))
 
-### Data cleansing
+## Data cleansing
 ```{r colnames, results='hide'}
 library(data.table)
 
@@ -91,7 +93,7 @@ of which do not have the proper magnitude designations: K, M or B. In those
 instances, thousand (K) is assumed. If magnitude is specified as one of the number
 between 1 to 9, the number is used as the exponent of 10.
 
-#### Adjusting property and crop damages
+### Adjusting property and crop damages
 
 ```{r damage calc, results='hide'}
 dmgAmt <- function(value, magnitude = 'K') {
@@ -124,7 +126,7 @@ dtl[PROPDMG > 0, PropDmg:=dmgAmt(PROPDMG, PROPDMGEXP)]
 dtl[CROPDMG > 0, CropDmg:=dmgAmt(CROPDMG, CROPDMGEXP)]
 ```
 
-#### Summary from adjusting the affected damage estimates
+### Summary from adjusting the affected damage estimates
 
 ```{r adjust magnitude}
 bad.propexp <- dtl[, PROPDMG > 0 & !grepl('[KMBkmb]', PROPDMGEXP)]
@@ -148,7 +150,7 @@ in property damage estimates, or $`r ceiling((dmg.summary[2,1] - dmg.summary[1,1
 billions.
 
 
-#### Summary of Damage Estimates by States
+### Summary of Damage Estimates by States
 
 ```{r damage tally}
 dmg.summary <- dtl[, .('Prop Damage'=sum(PropDmg, na.rm = T),
@@ -190,7 +192,7 @@ dtl[REFNUM == 605943, ':='(PROPDMG=13.75,
 
 
 
-### Dimensionality reduction (feature extraction) of EVTYPE
+## Dimensionality reduction (feature extraction) of EVTYPE
 
 ```{r event types}
 # Permitted Storm Data Events
@@ -245,7 +247,7 @@ dtl <- merge(dtl, evmap, by = 'EVTYPE', all.x = T)
 head(dtl[, c('EVTYPE', 'EventName'), with=F])
 ```
 
-If ambiguous, EVTYPE is cross-reference against REMARKS.
+Where ambiguous, EVTYPE is cross-reference against REMARKS.
 
 ```{r grepl EVTYPE REMARK, results='hide'}
 ## EVTYPE summary...
@@ -267,7 +269,7 @@ dtl[grepl('summary', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EventName:='Blizza
 
 ```
 
-#### Summary of EVTYPE extraction
+### Summary of EVTYPE extraction
 
 ```{r mapping assessment}
 
@@ -293,11 +295,14 @@ dmg.summary
 dmg.notmapped / dmg.mapped
 ```
 
+
+### ...
+
 Weather events can also be further reduced using key weather elements to enhance
 the analysis.
 
 ```{r elements}
-summary(evlist)
+summary(evlist) # list of official event names and the associated key elements
 
 dtl <- merge(dtl, evlist, by = 'EventName', all.x = T)
 
@@ -306,7 +311,7 @@ summary(dtl[, c('EVTYPE', 'EventName', 'Element1', 'Element2'), with=F])
 ```
 
 
-#### Bureau of Economic Analysis (BEA)
+### Bureau of Economic Analysis (BEA)
 When comparing economic data, BEA further defines the states in the US into
 [8 regions](http://bea.gov/regional/docs/regions.cfm):
 
@@ -331,11 +336,11 @@ dtl <- merge(dtl, regions, by = 'STATE', all.x = T)
 str(dtl[, c('STATE', 'Region'), with=F])
 ```
 
-## Results
+# Results
 
 ***
 
-## Assignment Instructions 
+# Assignment Instructions 
 
 The basic goal of this assignment is to explore the NOAA Storm Database and answer some basic questions about severe weather events. You must use the database to answer the questions below and show the code for your entire analysis. Your analysis can consist of tables, figures, or other summaries. You may use any R package you want to support your analysis.
 
@@ -350,9 +355,9 @@ Your data analysis must address the following questions:
 Consider writing your report as if it were to be read by a government or municipal manager who might be responsible for preparing for severe weather events and will need to prioritize resources for different types of events. However, there is no need to make any specific recommendations in your report.
 
 
-###Requirements
+##Requirements
 
-####Document Layout
+###Document Layout
 
 Language: Your document should be written in English.
 
@@ -372,7 +377,7 @@ Your analysis must have no more than three figures. Figures may have multiple pl
 
 You must show all your code for the work in your analysis document. This may make the document a bit verbose, but that is okay. In general, you should ensure that echo = TRUE for every code chunk (this is the default setting in knitr).
 
-####Publishing Your Analysis
+###Publishing Your Analysis
 
 For this assignment you will need to publish your analysis on RPubs.com. If you do not already have an account, then you will have to create a new account. After you have completed writing your analysis in RStudio, you can publish it to RPubs by doing the following:
 

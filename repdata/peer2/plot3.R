@@ -14,11 +14,9 @@ dt0[is.na(INJURIES),   INJURIES:=0]
 
 
 dt1 <- aggregate(cbind(econ=(PropDmg+CropDmg),
-                       humn=(FATALITIES+INJURIES)) ~ EventName + STATE,
+                       humn=(FATALITIES+INJURIES)) ~ EventName + STATE + year + month,
                  data = dt0, sum, na.rm = T)
 
-l <- xyplot(humn~econ | EventName,
-            data = dt1,
-            scales=list(y=list(log10),x=list(log10)))
+bwplot(~econ | EventName, data = dt1)
 
-print(l)
+stripplot(~humn | EventName, data = dt1)
