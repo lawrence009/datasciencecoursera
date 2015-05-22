@@ -77,7 +77,7 @@ ROW,EVTYPE,EventName
 76,damaging freeze,
 77,deep hail,Hail
 78,dense fog,
-79,dense smoke,
+79,dense smoke,Dense Smoke
 80,downburst,
 81,downburst winds,
 82,driest month,
@@ -169,8 +169,8 @@ ROW,EVTYPE,EventName
 168,flooding,Flood
 169,flooding/heavy rain,Flood
 170,floods,Flood
-171,fog,
-172,fog and cold temperatures,
+171,fog,Dense Fog
+172,fog and cold temperatures,Freezing Fog
 173,forest fires,Wildfire
 174,freeze,Frost/Freeze
 175,freezing drizzle,Frost/Freeze
@@ -207,8 +207,8 @@ ROW,EVTYPE,EventName
 206,gusty thunderstorm winds,Thunderstorm Wind
 207,gusty wind,Strong Wind
 208,gusty wind/hail,Strong Wind
-209,gusty wind/hvy rain,
-210,gusty wind/rain,
+209,gusty wind/hvy rain,Strong Wind
+210,gusty wind/rain,Strong Wind
 211,gusty winds,Strong Wind
 212,hail,Hail
 213,hail 0.75,Hail
@@ -432,16 +432,16 @@ ROW,EVTYPE,EventName
 431,local flash flood,Flash Flood
 432,local flood,Flood
 433,locally heavy rain,
-434,low temperature,
-435,low temperature record,
+434,low temperature,Cold/Wind Chill
+435,low temperature record,Extreme Cold/Wind Chill
 436,low wind chill,Extreme Cold/Wind Chill
 437,major flood,Flood
 438,marine accident,
-439,marine hail,Hail
-440,marine high wind,
+439,marine hail,Marine Hail
+440,marine high wind,Marine High Wind
 441,marine mishap,
-442,marine strong wind,
-443,marine thunderstorm wind,
+442,marine strong wind,Marine Strong Wind
+443,marine thunderstorm wind,Marine Thunderstorm Wind
 444,marine tstm wind,
 445,"metro storm, may 26",
 446,microburst,Thunderstorm Wind
@@ -494,7 +494,7 @@ ROW,EVTYPE,EventName
 493,record  cold,Extreme Cold/Wind Chill
 494,record cold,Extreme Cold/Wind Chill
 495,record cold and high wind,Extreme Cold/Wind Chill
-496,record cold/frost,
+496,record cold/frost,Extreme Cold/Wind Chill
 497,record cool,Extreme Cold/Wind Chill
 498,record dry month,
 499,record dryness,
@@ -560,7 +560,7 @@ ROW,EVTYPE,EventName
 559,small stream urban flood,Flood
 560,small stream/urban flood,Flood
 561,sml stream fld,Flood
-562,smoke,
+562,smoke,Dense Smoke
 563,snow,
 564,snow- high wind- wind chill,
 565,snow accumulation,

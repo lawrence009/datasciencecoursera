@@ -135,6 +135,9 @@ dmgAmt <- function(value, magnitude = 'K') {
 dts[PROPDMG > 0, PropDmg:=dmgAmt(PROPDMG, PROPDMGEXP)]
 
 dts[CROPDMG > 0, CropDmg:=dmgAmt(CROPDMG, CROPDMGEXP)]
+
+dts[is.na(PropDmg), PropDmg:=0]
+dts[is.na(CropDmg), CropDmg:=0]
 ```
 
 ### Summary from adjusting the affected damage estimates
@@ -144,10 +147,10 @@ bad.propexp <- dts[, PROPDMG > 0 & grepl('[^KBMkmb]', PROPDMGEXP)]
 
 bad.cropexp <- dts[, CROPDMG > 0 & grepl('[^KMBkmb]', CROPDMGEXP)]
 
-propdmg <- dts[bad.propexp, .(PROPDMG=sum(PROPDMG, na.rm = T),
-                              PropDmg=sum(PropDmg, na.rm = T))]
-cropdmg <- dts[bad.cropexp, .(CROPDMG=sum(CROPDMG, na.rm = T),
-                              CropDmg=sum(CropDmg, na.rm = T))]
+propdmg <- dts[bad.propexp, .(PROPDMG=sum(PROPDMG),
+                              PropDmg=sum(PropDmg))]
+cropdmg <- dts[bad.cropexp, .(CROPDMG=sum(CROPDMG),
+                              CropDmg=sum(CropDmg))]
 
 dmg.summary <- cbind(t(propdmg), t(cropdmg))
 colnames(dmg.summary) <- c('Properties', 'Crops')
@@ -156,11 +159,9 @@ rownames(dmg.summary) <- c('Original', 'Adjusted')
 dmg.summary
 ```
 
-The adjustment resulted in `r ceiling(dmg.summary[2,1] / dmg.summary[1,1])`-fold
+The adjustment resulted in `r ceiling(dmg.summary[2,1] / dmg.summary[1,1]) - 1`-fold
 improvement in property damage estimates, or $`r ceiling((dmg.summary[2,1] - dmg.summary[1,1]) / 1e3)`
-billions, and in `r ceiling(dmg.summary[2,2] / dmg.summary[1,2])`-fold
-improvement in crop damage estimates,
-or $`r ceiling((dmg.summary[2,2] - dmg.summary[1,2]) / 1e3)` billions.
+billions.
 
 
 ### Summary of damage estimates by states
@@ -180,7 +181,7 @@ head(dmg.summary)
 And those states have no reported human injuries, fatalities, property or crop
 damages are: `r dmg.summary$STATE[zero.dmg]`
 
-#### 2005 New Year's Eve Napa Valley Flood
+### 2005 New Year's Eve Napa Valley Flood
 The initial data exploration revealed that property and crop damage estimates of
 the flood in Napa 2006 (REFNUM 605943) were erroneous by several order of
 magnitude.
@@ -242,7 +243,7 @@ A pragmatic alternative approach is to alphabetically sort and save the list
 unique EVTYPE to a csv file first.
 
 ```{r write foo.csv}
-write.table(sort(unique(dtl$EVTYPE)),
+write.table(sort(unique(dts$EVTYPE)),
             'foo.csv', sep =',', col.names = c('EVTYPE'), row.names = F)
 ```
 
@@ -252,7 +253,7 @@ the a EVTYPE-to-EventName mapping file found [here](https://github.com/lawrence0
 ```{r merge evmap}
 evmap <- read.csv('EventMapping.csv', na.strings = '', colClasses = 'character')[2:3]
 
-#What percent of EVTYPE is not mapped
+#fraction of EVTYPE that is not mapped
 sum(is.na(evmap)) / length(evtype)
 
 #append the official event name
@@ -283,22 +284,24 @@ dts[grepl('^summary', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EventName:='Blizz
 
 ```
 
-### Summary of EVTYPE extraction
+### Assessment of EVTYPE extraction
 
 ```{r mapping assessment}
 
+sum(is.na(dts$EventName)) / length(dts$EventName)
+
 dmg.notmapped <- dts[is.na(EventName),
-                    .(fatalities=sum(FATALITIES, na.rm = T),
-                      injuries=sum(INJURIES, na.rm = T),
-                      proddmg=sum(PropDmg, na.rm = T),
-                      cropdmg=sum(CropDmg, na.rm = T))]
+                    .(fatalities=sum(FATALITIES),
+                      injuries=sum(INJURIES),
+                      proddmg=sum(PropDmg),
+                      cropdmg=sum(CropDmg))]
 
 
 dmg.mapped <- dts[!is.na(EventName),
-                  .(fatalities=sum(FATALITIES, na.rm = T),
-                    injuries=sum(INJURIES, na.rm = T),
-                    proddmg=sum(PropDmg, na.rm = T),
-                    cropdmg=sum(CropDmg, na.rm = T))]
+                  .(fatalities=sum(FATALITIES),
+                    injuries=sum(INJURIES),
+                    proddmg=sum(PropDmg),
+                    cropdmg=sum(CropDmg))]
 
 
 dmg.summary <- as.matrix(rbind(dmg.mapped, dmg.notmapped))
@@ -309,6 +312,8 @@ dmg.summary
 dmg.notmapped / dmg.mapped
 ```
 
+**Conclusion:** The process is effective eventhough only `r round(sum(is.na(evmap)) / length(evtype) * 100)`
+percent of the EVTYPE is mapped.
 
 ### Key weather elements
 
@@ -339,6 +344,7 @@ When comparing economic data, BEA further defines the states in the US into
 8. Far West
 
 The region-to-state mapping extract from BEA can be found [here](https://github.com/lawrence009/datasciencecoursera/blob/master/repdata/peer2/BureauOfEconomicAnalysisRegions.csv).
+
 ```{r BEA US regions}
 regions <- read.csv('BureauOfEconomicAnalysisRegions.csv')[c(3, 1)]
 colnames(regions)[1] <- 'STATE'
@@ -352,22 +358,43 @@ summary(dts[, c('STATE', 'Region'), with=F])
 
 # Analysis
 
+```{r}
+colnames(dts)
+
+dts <- dts[, c(1:2, 5, 24:29, 38:43), with=F]
+
+colnames(dts)
+
+summary(dts)
+
+element.freq <- table(dts[, c('Region', 'Element1'), with=F])
+
+element.freq
+
+dmg.freq <- table(dts[(FATALITIES + INJURIES + PropDmg + CropDmg) > 0,
+                      c('Region', 'Element1'), with=F])
+
+dmg.freq
+
+dmg.freq / element.freq
+
+```
+
 
 # Results
 
-```{r fig1}
+```{r fig1 humn}
 library(lattice)
 
 #casuality mulitplier
 lamda <- 100
 
-dt0 <- transform(dtx, econ=(PropDmg + CropDmg),
-                      humn=(FATALITIES*lamda + INJURIES),
-                      year=as.factor(year(BGN_DATE)),
-                      month=as.factor(month(BGN_DATE))
-                 )
+dts[, ':='(econ  =(PropDmg*lamda + CropDmg),
+           humn  =(FATALITIES*lamda + INJURIES),
+           year  =as.factor(year(BGN_DATE)),
+           month =as.factor(month(BGN_DATE)))] -> dts #supress print; not copied
 
-bwplot(humn~Element1 | Region , data = dt0[humn > 0],
+bwplot(humn~Element1 | Region , data = dts[humn > 0],
        par.strip.text = list(cex = 0.8),
        main = 'Human Casulities (adjusted for fatalities)',
        ylab = 'Fatalities and Injuries',
@@ -381,7 +408,7 @@ bwplot(humn~Element1 | Region , data = dt0[humn > 0],
 
 ```{r fig2 econ}
 
-bwplot(econ~Element1 | Region, data = dt0[econ > 0],
+bwplot(econ~Element1 | Region, data = dts[econ > 0],
        par.strip.text = list(cex = 0.8),
        main = 'Economic Impact',
        ylab = 'Property and Crop Damages (dollar)',
