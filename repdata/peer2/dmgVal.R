@@ -84,6 +84,7 @@ rm(propdmg, cropdmg)
 dtl[is.na(PropDmg), PropDmg:=0]
 dtl[is.na(CropDmg), CropDmg:=0]
 
-dtl[is.na(FATALITIES), FATALITIES:=0]
-dtl[is.na(INJURIES),   INJURIES:=0]
+# not necessary; no NA
+# dtl[is.na(FATALITIES), FATALITIES:=0]
+# dtl[is.na(INJURIES),   INJURIES:=0]
 

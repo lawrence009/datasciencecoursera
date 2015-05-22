@@ -49,17 +49,17 @@ evmap.ok <- evmap$EVTYPE[!is.na(evmap$EventName)]
 
 
 dmg.notmapped <- dtl[which(EVTYPE %in% evmap.NA),
-                    .(fatalities=sum(FATALITIES, na.rm = T),
-                      injuries=sum(INJURIES, na.rm = T),
-                      proddmg=sum(PropDmg, na.rm = T),
-                      cropdmg=sum(CropDmg, na.rm = T))]
+                    .(fatalities=sum(FATALITIES),
+                      injuries=sum(INJURIES),
+                      proddmg=sum(PropDmg),
+                      cropdmg=sum(CropDmg))]
 
 
 dmg.mapped <- dtl[which(EVTYPE %in% evmap.ok),
-                  .(fatalities=sum(FATALITIES, na.rm = T),
-                    injuries=sum(INJURIES, na.rm = T),
-                    proddmg=sum(PropDmg, na.rm = T),
-                    cropdmg=sum(CropDmg, na.rm = T))]
+                  .(fatalities=sum(FATALITIES),
+                    injuries=sum(INJURIES),
+                    proddmg=sum(PropDmg),
+                    cropdmg=sum(CropDmg))]
 
 
 dmg.summary <- as.matrix(rbind(dmg.mapped, dmg.notmapped))
@@ -76,9 +76,9 @@ evtable <- read.csv('EventTable.csv',
 dtx <- merge(dtx, evtable, by = 'EventName', all.x = T)
 
 
-hist((as.numeric(as.factor(dtx$EventName))))
+hist((as.numeric(dtx$EventName)))
 
-hist((as.numeric(as.factor(dtx$Element1))))
+hist((as.numeric(dtx$Element1)))
 
 
 
@@ -88,3 +88,7 @@ colnames(regions)[1] <- 'STATE'
 dtx <- merge(dtx, regions, by = 'STATE', all.x = T)
 
 summary(dtx)
+
+table(dtx[(FATALITIES + INJURIES + PropDmg + CropDmg) > 0, c('Region', 'Element1'), with=F]) -> dmg.freq
+table(dtx[, c('Region', 'Element1'), with=F]) -> element.freq
+
