@@ -1,10 +1,11 @@
-# human casuality (unadjusted)
+# event frequency; adjusted
 
 library(data.table)
+library(reshape2)
 library(lattice)
 
 #casuality mulitplier
-lamda <- 1
+lamda <- 100
 
 dt0 <- transform(dtx, econ=(PropDmg + CropDmg),
                       humn=(FATALITIES*lamda + INJURIES),
@@ -12,13 +13,15 @@ dt0 <- transform(dtx, econ=(PropDmg + CropDmg),
                       month=as.factor(month(BGN_DATE))
                  )
 
-p <- dotplot(humn~Element1 | Region, data = dt0[humn > 0],
-             main = 'Human Casulities',
-             ylab = 'Fatalities and Injuries',
-             scales=list(x=list(rot=90), y = list(log = 10)))
+dt1 <- table(dt0[, c('Region', 'Element1'), with=F])
+dt1 <- melt(dt1)
+
+p <- barchart(value ~ Element1 | Region, data = dt1,
+              main = 'Frequency of Events',
+              ylab = 'No. of Occurences',
+              scales=list(x=list(rot = 90)))
 
 print(p)
-
 
 setorder(dt0, humn)
 dt0

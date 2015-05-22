@@ -1,4 +1,4 @@
-# property damage
+# property damage; stripplot
 
 library(data.table)
 library(lattice)
@@ -13,8 +13,9 @@ dt0 <- transform(dtx, econ=(PropDmg + CropDmg),
                  )
 
 
-p <- stripplot(Element1~econ | Region, data = dt0[econ > 0],
-               jitter.data = T)
+p <- stripplot(econ~Element1 | Region, data = dt0[econ > 0],
+               jitter.data = T,
+               scales=list(x=list(rot=90), y = list(log = 10)))
 
 print(p)
 

@@ -1,4 +1,4 @@
-# human casuality dotplot; unadjusted
+# human casuality bwplot; unadjusted
 
 library(data.table)
 library(lattice)
@@ -12,8 +12,10 @@ dt0 <- transform(dtx, econ=(PropDmg + CropDmg),
                       month=as.factor(month(BGN_DATE))
                  )
 
-p <- dotplot(Element1~humn | Region, data = dt0[humn > 0],
-             main = 'Human Casulities (unadjusted figures)')
+p <- bwplot(humn~Element1 | Region, data = dt0[humn > 0],
+            main = 'Human Casulities',
+            ylab = 'Fatalities and Injuries',
+            scales=list(x=list(rot=90), y = list(log = 10)))
 
 print(p)
 

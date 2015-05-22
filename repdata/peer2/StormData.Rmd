@@ -23,7 +23,9 @@ According to the [NOAA Storm Database](http://www.ncdc.noaa.gov/stormevents/ftp.
 states in the Southeast and Southwest are most suspectible to severe storm and
 and flood related weather resulting in billions of properties damages. 
 
+* What types of event occurs most frequent
 
+* What types of event causes the greatest amount of damage
 
 * Across the United States, which types of events (as indicated in the EVTYPE
 variable) are most harmful with respect to population health?
@@ -348,6 +350,9 @@ dts <- merge(dts, regions, by = 'STATE', all.x = T)
 summary(dts[, c('STATE', 'Region'), with=F])
 ```
 
+# Analysis
+
+
 # Results
 
 ```{r fig1}
@@ -362,16 +367,28 @@ dt0 <- transform(dtx, econ=(PropDmg + CropDmg),
                       month=as.factor(month(BGN_DATE))
                  )
 
-dotplot(Element1~econ | Region, data = dt0[econ > 0],
-        par.strip.text=list(cex=0.8),
-        xlim = c(0, 1e7))
+bwplot(humn~Element1 | Region , data = dt0[humn > 0],
+       par.strip.text = list(cex = 0.8),
+       main = 'Human Casulities (adjusted for fatalities)',
+       ylab = 'Fatalities and Injuries',
+       scales = list(cex = 0.8,
+                     x = list(rot = 90),
+                     y = list(log = 10)))
+
 
 ```
 
-```{r fig2}
 
-dotplot(Element1~humn | Region, data = dt0[humn > 0],
-        par.strip.text=list(cex=0.8))
+```{r fig2 econ}
+
+bwplot(econ~Element1 | Region, data = dt0[econ > 0],
+       par.strip.text = list(cex = 0.8),
+       main = 'Economic Impact',
+       ylab = 'Property and Crop Damages (dollar)',
+       scales = list(cex = 0.8,
+                     x = list(rot = 90),
+                     y = list(log = 10)))
+
 
 ```
 

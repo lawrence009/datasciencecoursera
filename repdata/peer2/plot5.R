@@ -1,10 +1,10 @@
-# human casuality dotplot; unadjusted
+# human casuality bwplot; adjusted
 
 library(data.table)
 library(lattice)
 
 #casuality mulitplier
-lamda <- 1
+lamda <- 100
 
 dt0 <- transform(dtx, econ=(PropDmg + CropDmg),
                       humn=(FATALITIES*lamda + INJURIES),
@@ -12,18 +12,13 @@ dt0 <- transform(dtx, econ=(PropDmg + CropDmg),
                       month=as.factor(month(BGN_DATE))
                  )
 
-p <- bwplot(Element1~humn | Region, data = dt0[humn > 0],
-             main = 'Human Casulities (unadjusted figures)')
+p <- bwplot(humn~Element1 | Region , data = dt0[humn > 0],
+            main = 'Human Casulities (adjusted for fatalities)',
+            ylab = 'Fatalities and Injuries',
+            scales=list(x=list(rot=90), y = list(log = 10)))
 
 print(p)
 
 
 setorder(dt0, humn)
 dt0
-
-dt1 <- aggregate(data = dtx, FUN = sum,
-                 INJURIES ~ Element1 + Region)
-
-
-barchart(Element1~INJURIES | Region, data = dt1,
-             main = 'Human Casulities (unadjusted figures)')
