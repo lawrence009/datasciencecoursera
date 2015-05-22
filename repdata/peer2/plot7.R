@@ -12,15 +12,18 @@ dtx[, `:=`(econ  =(PropDmg + CropDmg),
            year  =(year(BGN_DATE)),
            month =as.factor(month(BGN_DATE)))]
 
-p <- histogram( ~BGN_DATE | Element1*Region , data = dtx[econ >0 | humn > 0],
+p <- histogram( ~BGN_DATE | Element1*Region , data = dtx[econ > 0 | humn > 0],
                par.strip.text = list(cex = 0.7),
-              main = 'Frequency of Events',
-              type = 'percent',
-              nint = 25,
-              #ylab = 'No. of Occurences',
-              scales=list(x=list(rot = 90)))
+               main = 'Frequency of Events',
+               type = 'count',
+               nint = 25,
+               scales = list(x=list(rot = 90),
+                             y=list(log = 10)))
 
 print(p)
 
 setorder(dtx, humn)
 dtx
+
+
+#http://www.r-bloggers.com/conditioning-and-grouping-with-lattice-graphics/
