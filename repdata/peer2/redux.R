@@ -92,3 +92,10 @@ summary(dtx)
 table(dtx[(FATALITIES + INJURIES + PropDmg + CropDmg) > 0, c('Region', 'Element1'), with=F]) -> dmg.freq
 table(dtx[, c('Region', 'Element1'), with=F]) -> element.freq
 
+merge(element.freq, dmg.freq, by=c('Region', 'Element1')) -> element.summary
+
+element.summary$ratio <- element.summary$Freq.y / element.summary$Freq.x
+
+with(element.summary, element.summary[order(Region, -ratio), ])
+
+with(element.summary, element.summary[order(Region, -Freq.y, -ratio), ])
