@@ -1,7 +1,7 @@
 source('readData.R')
 
 write.csv(sort(dtl[, unique(EVTYPE)]),
-          file = 'foo.csv')
+          file = 'foobar.csv')
 
 ## to save time, make a copy of events and avoid overwriting the origial copy
 events[, EVTYPE:=dtl$EVTYPE] #reset the EVTYPE value for dev/test
@@ -76,7 +76,7 @@ evtable <- read.csv('EventTable.csv',
 dtx <- merge(dtx, evtable, by = 'EventName', all.x = T)
 
 
-hist((as.numeric(dtx$EventName)))
+barplot(table(dtx$Region, dtx$Element1))
 
 hist((as.numeric(dtx$Element1)))
 
@@ -89,13 +89,3 @@ dtx <- merge(dtx, regions, by = 'STATE', all.x = T)
 
 summary(dtx)
 
-table(dtx[(FATALITIES + INJURIES + PropDmg + CropDmg) > 0, c('Region', 'Element1'), with=F]) -> dmg.freq
-table(dtx[, c('Region', 'Element1'), with=F]) -> element.freq
-
-merge(element.freq, dmg.freq, by=c('Region', 'Element1')) -> element.summary
-
-element.summary$ratio <- element.summary$Freq.y / element.summary$Freq.x
-
-with(element.summary, element.summary[order(Region, -ratio), ])
-
-with(element.summary, element.summary[order(Region, -Freq.y, -ratio), ])

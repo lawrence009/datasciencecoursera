@@ -239,12 +239,12 @@ dts[grepl('^high wind', EVTYPE), EVTYPE:='High Wind']
 dts[grepl('^hurricane', EVTYPE), EVTYPE:='Hurricane (Typhoon)']
 ```
 ... however matching EVTYPE and maintaining the code this way gets tedious quickly.
-A pragmatic alternative approach is to alphabetically sort and save the list
+A pragmatic alternative is to alphabetically sort and save the list
 unique EVTYPE to a csv file first.
 
 ```{r write foo.csv}
 write.table(sort(unique(dts$EVTYPE)),
-            'foo.csv', sep =',', col.names = c('EVTYPE'), row.names = F)
+            'foobar.csv', sep =',', col.names = c('EVTYPE'), row.names = F)
 ```
 
 Then the official names of events are assigned to the adjacent column to produce
@@ -265,7 +265,7 @@ head(dts[, c('EVTYPE', 'EventName'), with=F])
 Where ambiguous, EVTYPE is cross-reference against REMARKS.
 
 ```{r grepl EVTYPE REMARK, results='hide'}
-## EVTYPE summary...
+## EVTYPE is summary...
 
 #HUNDERSTORM WIND
 dts[grepl('^summary', EVTYPE) & grepl('[Tt]hunderstorm.*[Ww]ind', REMARKS), EventName:='Thunderstorm Wind']
@@ -284,7 +284,9 @@ dts[grepl('^summary', EVTYPE) & grepl('[Bb]lizzard', REMARKS), EventName:='Blizz
 
 ```
 
-### Assessment of EVTYPE extraction
+
+
+### Assessment of EVTYPE extraction (map and replace) to EventName
 
 ```{r mapping assessment}
 
@@ -317,8 +319,8 @@ percent of the EVTYPE is mapped.
 
 ### Key weather elements
 
-Weather events can also be further reduced using key weather elements to enhance
-the analysis: `r sort(unique(evlist$Element1))`
+Weather events can also be further reduced using `r length(unique(evlist$Element1))`
+key weather elements to enhance the analysis: `r sort(unique(evlist$Element1))`.
 
 ```{r elements}
 summary(evlist) # list of official event names and the associated key elements
@@ -329,6 +331,7 @@ summary(dts[, c('EVTYPE', 'EventName', 'Element1', 'Element2'), with=F])
 
 ```
 
+The majority of the weather events are linked to key weather elements: water, ice and wind. 
 
 ### Bureau of Economic Analysis (BEA)
 When comparing economic data, BEA further defines the states in the US into
@@ -343,7 +346,7 @@ When comparing economic data, BEA further defines the states in the US into
 7. Rocky Mountain
 8. Far West
 
-The region-to-state mapping extract from BEA can be found [here](https://github.com/lawrence009/datasciencecoursera/blob/master/repdata/peer2/BureauOfEconomicAnalysisRegions.csv).
+The region-to-state mapping extracted from BEA can be found [here](https://github.com/lawrence009/datasciencecoursera/blob/master/repdata/peer2/BureauOfEconomicAnalysisRegions.csv).
 
 ```{r BEA US regions}
 regions <- read.csv('BureauOfEconomicAnalysisRegions.csv')[c(3, 1)]
@@ -358,28 +361,48 @@ summary(dts[, c('STATE', 'Region'), with=F])
 
 # Analysis
 
-```{r}
+```{r event freq}
+library(knitr)
+
 colnames(dts)
 
 dts <- dts[, c(1:2, 5, 24:29, 38:43), with=F]
 
 colnames(dts)
 
-summary(dts)
 
-element.freq <- table(dts[, c('Region', 'Element1'), with=F])
+table(dts[(PropDmg + CropDmg) > 0, c('Region', 'Element1'), with=F]) -> dmg.freq
+table(dts[FATALITIES > 0, c('Region', 'Element1'), with=F]) -> ftl.freq
+table(dts[INJURIES   > 0, c('Region', 'Element1'), with=F]) -> inj.freq
 
-element.freq
 
-dmg.freq <- table(dts[(FATALITIES + INJURIES + PropDmg + CropDmg) > 0,
-                      c('Region', 'Element1'), with=F])
+freq.summary <- function(x) {
+    # returns a data frame summarizing the frequency of element by region
+    # x is a subset of dts that resembles y
+    
+    # distribution of event type by region
+    y <- table(dts[, c('Region', 'Element1'), with=F])
 
-dmg.freq
+    z <- merge(x, y, by=c('Region', 'Element1'))
 
-dmg.freq / element.freq
+    z$ratio <- z$Freq.x / z$Freq.y
 
+    with(z, z[order(Region, -Freq.x, -ratio), ])
+}
+
+
+# percent of event with human fatalities
+kable(freq.summary(ftl.freq), row.names = F, digits=2)
+
+# percent of event with human injuries
+kable(freq.summary(inj.freq), row.names = F, digits=2)
+
+# percent of event with property or crop damange
+kable(freq.summary(dmg.freq), row.names = F, digits=2)
+ 
 ```
 
+@@
 
 # Results
 
@@ -389,7 +412,7 @@ library(lattice)
 #casuality mulitplier
 lamda <- 100
 
-dts[, ':='(econ  =(PropDmg*lamda + CropDmg),
+dts[, ':='(econ  =(PropDmg + CropDmg),
            humn  =(FATALITIES*lamda + INJURIES),
            year  =as.factor(year(BGN_DATE)),
            month =as.factor(month(BGN_DATE)))] -> dts #supress print; not copied
