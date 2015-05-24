@@ -1,5 +1,5 @@
 # 4. Across the United States, how have emissions from coal combustion-related
-# sources changed from 1999–2008?
+# sources changed from 1999-2008?
 
 ## Load and process data
 
@@ -26,7 +26,9 @@ if (!exists('SCC')) {
 }
 
 
-coal.sources <- with(SCC, as.character(SCC[grepl('[Cc]oal', Short.Name)]))
+coal.sources <- with(SCC, as.character(SCC[grepl('comb.*coal',
+                                                 Short.Name,
+                                                 ignore.case = T)]))
 
 pm25coal <- subset(NEI,
                    SCC %in% coal.sources,
