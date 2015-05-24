@@ -1,6 +1,19 @@
 # 1.Have total emissions from PM2.5 decreased in the United States from 1999
 # to 2008?
 
+## Load and process data
+
+url <- 'https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip'
+filename <- 'exdata-data-NEI_data.zip'
+
+#check if the data file is available
+if (!file.exists(filename)) {
+    download.file(url = url, destfile = filename)
+    unzip(filename)
+}
+
+
+
 library(data.table)
 
 ## Load and process data
