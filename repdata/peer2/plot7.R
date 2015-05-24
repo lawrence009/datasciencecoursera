@@ -12,7 +12,7 @@ dtx[, `:=`(econ  =(PropDmg + CropDmg),
            year  =(year(BGN_DATE)),
            month =as.factor(month(BGN_DATE)))]
 
-p <- histogram( ~BGN_DATE | Element1*Region , data = dtx[econ > 0 | humn > 0],
+p <- histogram( ~BGN_DATE | Element1 , data = dtx[econ > 0 | humn > 0],
                par.strip.text = list(cex = 0.7),
                main = 'Frequency of Events',
                type = 'count',
