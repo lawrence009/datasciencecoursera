@@ -311,7 +311,7 @@ dts[grepl('^hurricane', EVTYPE), EVTYPE:='Hurricane (Typhoon)']</code></pre>
 <p>… however matching EVTYPE and maintaining the code this way gets tedious quickly. A pragmatic alternative is to alphabetically sort and save the list unique EVTYPE to a csv file first.</p>
 <pre class="r"><code>write.table(sort(unique(dts$EVTYPE)),
             'foobar.csv', sep =',', col.names = c('EVTYPE'), row.names = F)</code></pre>
-<p>Then the official names of events are assigned to the adjacent column to produce the a EVTYPE-to-EventName mapping file found <a href="https://github.com/lawrence009/datasciencecoursera/blob/master/repdata/peer2/EventMapping.csv">here</a>.</p>
+<p>Then the official names of events are assigned to the adjacent column to produce the a EVTYPE-to-EventName mapping file found <a href="https://github.com/lawrence009/datasciencecoursera/blob/master/repdata/peer2/EventMapping.csv">here</a> and <a href="https://github.com/lawrence009/datasciencecoursera/blob/master/repdata/peer2/EventTable.csv">here</a>.</p>
 <pre class="r"><code>evmap &lt;- read.csv('EventMapping.csv', na.strings = '', colClasses = 'character')[2:3]
 
 #fraction of EVTYPE that is not mapped

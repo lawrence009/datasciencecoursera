@@ -315,7 +315,8 @@ write.table(sort(unique(dts$EVTYPE)),
 ```
 
 Then the official names of events are assigned to the adjacent column to produce
-the a EVTYPE-to-EventName mapping file found [here](https://github.com/lawrence009/datasciencecoursera/blob/master/repdata/peer2/EventMapping.csv).
+the a EVTYPE-to-EventName mapping file found [here](https://github.com/lawrence009/datasciencecoursera/blob/master/repdata/peer2/EventMapping.csv) and
+[here](https://github.com/lawrence009/datasciencecoursera/blob/master/repdata/peer2/EventTable.csv).
 
 
 ```r
