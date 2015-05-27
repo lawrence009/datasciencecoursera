@@ -364,8 +364,8 @@ by event frequencies to aid prioritizing emergency resource and preparation.
 
 Assessments of human causalities and economy impact by region and primary
 weather elements were presented next.  A causality multiplier (lamda = 100) was
-applied to the fatality figures (fatality = 100 injuries) when assessing impact
-too population to health.
+applied to the fatality figures (1 fatality = 100 injuries) when assessing impact
+to population health.
 
 ## Event frequencies
 
