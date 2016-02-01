@@ -95,5 +95,5 @@ plot(best.model, which=c(4,6))
 
 ---
 
-*Note:* See https://github.com/lawrence009/jhudatascience/tree/master/statinf for the source Rmd.
+*Note:* See https://github.com/lawrence009/jhudatascience/tree/master/reg for the source Rmd.
 
