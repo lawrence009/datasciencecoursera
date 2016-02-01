@@ -61,8 +61,8 @@ theoretical variance, i.e., Central Limit Theorem.
 ## Approximately normal sample distribution
 
 The sample distribution (graphically illustrated as white bars) are
-approximately normally distributed, as compared to theoretical normal
-(demonstrated via `dnorm`).
+approximately normally distributed, having nearly the same shape as compared
+to theoretical normal (demonstrated via `dnorm`).
 
 ```{r hist}
 library(ggplot2)

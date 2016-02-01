@@ -1,0 +1,78 @@
+---
+title: 'Statistical Inference Course Project: Part Two (the Response of Vitamin C on
+  Tooth Growth in Guinea Pigs)'
+author: "Lawrence Chen"
+date: "January 31, 2016"
+output: pdf_document
+---
+
+
+# Experiment results
+
+Sixty guinea pigs were treated with vitamin C which suggests its positive response on
+tooth growth. The data is sourced from C. I. Bliss (1952)
+*The Statistics of Bioassay*. Academic Press.
+
+The response is measured as the length of odontoblasts (cells responsible for
+tooth growth). Each animal received one of three dose levels of vitamin C
+(0.5, 1, and 2 mg/day) by one of two delivery methods. The control group
+receives orange juice (coded as OJ); the experimental group received ascorbic
+acid (a form of vitamin C and coded as VC).
+
+```{r data, echo=FALSE}
+# Explicitly load ToothGrowth data.frame from {datasets}
+data(ToothGrowth)
+
+library(ggplot2)
+ggplot(ToothGrowth, aes(x = as.factor(dose), y = len, color = supp)) +
+  geom_boxplot() +
+  labs(x = 'Dose (mg/Day)', y = 'Response')
+```
+
+The data seems to suggest that OJ had a more positive effect on tooth growth
+at lower dosage and that the effect diminished as dosage increased.
+
+```{r}
+summary(ToothGrowth)
+with(ToothGrowth, tapply(len, list(supp, dose), mean))
+with(ToothGrowth, tapply(len, list(supp, dose), var))
+```
+
+# Hyopthesis testing
+
+## H~0~: There is no difference in the effect of two suppliments independent of dosage. 
+
+```{r}
+with(ToothGrowth, t.test(len~supp))
+```
+
+p > 0.05. Therefore we accept the null hypothesis that both supplements
+have equal effect on tooth growth
+
+## H~0~: There is no difference in the effect at lower dosages.
+
+```{r}
+with(subset(ToothGrowth, dose == 1), t.test(len~supp))
+with(subset(ToothGrowth, dose == .5), t.test(len~supp))
+```
+
+p < 0.05. However, the confidence intervals overlap the two group means, and
+therefore cannot definitively conclude there is significant difference
+at lower dosages.
+
+## H~0~: Dosage, independent of the types of supplements, has no signficant effect.
+
+```{r}
+with(subset(ToothGrowth, dose == c(0.5, 2)), t.test(len~dose))
+```
+
+p < 0.01 and the confidence intervals clearly do not overlap the group means.
+We therefore conclude there is a positive effect of supplement dosage.
+
+# Conclusions
+
+* There is no significant difference between using OJ or VC as supplements
+* Higher dosage, regardless of the source of vitamin C, suggest providing
+supplements promotes tooth growth
+* In order to determine if vitamin C promotes tooth growth, the experiment
+should be repeated with a control group given a placebo, i.e. no vitamin C 

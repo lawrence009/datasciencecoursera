@@ -1,6 +1,3 @@
----
-output: html_document
----
 # Statistical Inference Course Project
 
 ## Introduction
