@@ -40,7 +40,19 @@ with(ToothGrowth, tapply(len, list(supp, dose), var))
 
 # Hyopthesis testing
 
-## H~0~: There is no difference in the effect of two suppliments independent of dosage. 
+## H~0~: Dosage, independent of the types of supplements, has no signficant effect.
+
+```{r}
+with(subset(ToothGrowth, dose == c(0.5, 1)), t.test(len~dose))
+```
+
+p < 0.01 and the confidence intervals clearly do not overlap the group means.
+We therefore conclude there is a positive effect of supplement dosage.
+
+*Omitted:* additional t-tests can be performed against other dosages to
+further validate this point.
+
+## H~0~: There is no difference in the effect between two suppliments independent of dosage. 
 
 ```{r}
 with(ToothGrowth, t.test(len~supp))
@@ -60,19 +72,15 @@ p < 0.05. However, the confidence intervals overlap the two group means, and
 therefore cannot definitively conclude there is significant difference
 at lower dosages.
 
-## H~0~: Dosage, independent of the types of supplements, has no signficant effect.
-
-```{r}
-with(subset(ToothGrowth, dose == c(0.5, 2)), t.test(len~dose))
-```
-
-p < 0.01 and the confidence intervals clearly do not overlap the group means.
-We therefore conclude there is a positive effect of supplement dosage.
 
 # Conclusions
 
-* There is no significant difference between using OJ or VC as supplements
 * Higher dosage, regardless of the source of vitamin C, suggest providing
 supplements promotes tooth growth
+* There is no significant difference between using OJ or VC as supplements
 * In order to determine if vitamin C promotes tooth growth, the experiment
 should be repeated with a control group given a placebo, i.e. no vitamin C 
+
+---
+
+*Note:* See https://github.com/lawrence009/jhudatascience/tree/master/statinf for the source Rmd.
