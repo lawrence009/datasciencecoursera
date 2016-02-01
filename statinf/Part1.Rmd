@@ -1,0 +1,84 @@
+---
+title: 'Statistical Inference Course Project: Part One (Simulation Exercise)'
+author: "Lawrence Chen"
+date: "January 31, 2016"
+output: pdf_document
+---
+
+# Overview
+
+The following exercise investigates the properties of the exponential
+distribution via simulation and compares it with the Central Limit Theorem.
+The simulation will show that the the averages of 40 exponentials is 
+approximately normal.
+
+The exponential distribution is expressed in R as `rexp(n, lamda)` where
+`lambda` is the rate parameter. The mean of exponential distribution is
+`1/lambda` and the standard deviation is also `1/lambda`.
+
+lambda is set at 0.2 for the sample (n=40) given 1,000 simulated averages.
+
+```{r sim}
+set.seed(25)
+
+# simulation vars
+lambda <- .2
+n <- 40L
+sims <- 1e3L
+
+# averages of 40 exponetials given 1,000 simluations
+sim.means <- rowMeans(matrix(rexp(sims * n, rate = lambda), sims, n))
+
+summary(sim.means)
+```
+
+# Results
+
+## Center of distribution
+
+The sample mean of 40 exponentials is centered at `r round(mean(sim.means), 3)`,
+which is very close to `r round(1/lambda, 3)`, the theoretical center of
+distribution 1/lambda.
+
+## Sample variability
+
+```{r vars}
+# sample sd
+sd(sim.means)
+
+# expected sd
+(1/lambda) / sqrt(n)
+
+# variance of the sample
+var(sim.means)
+
+# variance of the expected
+((1/lambda) / sqrt(n))^2
+```
+The variabilities in the distribution of the sample are very close to the
+theoretical variance, i.e., Central Limit Theorem.  
+
+## Approximately normal sample distribution
+
+The sample distribution (graphically illustrated as white bars) are
+approximately normally distributed, as compared to theoretical normal
+(demonstrated via `dnorm`).
+
+```{r hist}
+library(ggplot2)
+
+ggplot(data.frame(x=sim.means), aes(x=sim.means)) +
+  geom_histogram(aes(y=..density..),
+                 fill = 'white', color = 'black', 
+                 binwidth = .2) +
+  stat_function(fun = dnorm,
+                arg = list(mean = 1/lambda, sd = (1/lambda) / sqrt(n))) +
+  labs(x = 'Average of 40 Samples',
+       title = 'Sample vs. Theroritical Disitrubtions')
+```
+
+
+---
+
+*Note:* See https://github.com/lawrence009/jhudatascience/tree/master/statinf for the source Rmd.
+
